@@ -26,7 +26,7 @@
     font-family: 'Tajawal', sans-serif;
     min-height:100vh;
   }
-  .wrap{max-width: 760px; margin: 0 auto; padding: 48px 20px 120px;}
+  .wrap{max-width: 760px; margin: 0 auto; padding: 48px 20px 80px;}
 
   header{text-align:center; margin-bottom: 40px;}
   .kicker{
@@ -95,17 +95,37 @@
   .results{margin-top: 22px; display:flex; flex-direction:column; gap:10px;}
   .row{
     display:flex;
-    align-items:center;
-    justify-content:space-between;
-    gap: 12px;
+    flex-direction:column;
     background: var(--bg);
     border: 1px solid var(--line);
     border-radius: 12px;
     padding: 14px 16px;
   }
+  .row .row-top{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap: 12px;
+  }
   .row .info{display:flex; flex-direction:column; gap:4px;}
   .row .surah-name{font-size:17px; font-weight:700;}
   .row .reciter-name{font-size:13px; color: var(--muted);}
+
+  .audio-wrap{
+    display:none;
+    margin-top: 14px;
+    padding-top: 14px;
+    border-top: 1px solid var(--line);
+  }
+  .audio-wrap.open{display:block;}
+  .audio-wrap audio{
+    width: 100%;
+    height: 40px;
+  }
+  /* Style the native player to match the theme where supported */
+  .audio-wrap audio::-webkit-media-controls-panel{
+    background-color: var(--panel);
+  }
   .btn-group{display:flex; gap:8px; flex-shrink:0;}
 
   .dl-btn{
@@ -138,40 +158,7 @@
   }
   .listen-btn:active{transform: translateY(1px);}
 
-  .player-bar{
-    position: fixed;
-    left: 0; right: 0; bottom: 0;
-    background: var(--panel);
-    border-top: 1px solid var(--line);
-    padding: 12px 16px calc(12px + env(safe-area-inset-bottom, 0px));
-    display:none;
-    align-items:center;
-    gap: 12px;
-    z-index: 10;
-  }
-  .player-bar.active{display:flex;}
-  .player-bar .p-info{flex:1; min-width:0;}
-  .player-bar .p-title{font-size:14px; font-weight:700; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;}
-  .player-bar .p-sub{font-size:12px; color: var(--muted);}
-  .player-bar .p-toggle{
-    flex-shrink:0;
-    width:40px; height:40px;
-    border-radius:50%;
-    border:none;
-    background: var(--gold-soft);
-    color:#1a1207;
-    font-size:16px;
-    cursor:pointer;
-  }
-  .player-bar .p-close{
-    flex-shrink:0;
-    background:none;
-    border:none;
-    color: var(--muted);
-    font-size:20px;
-    cursor:pointer;
-    padding: 6px;
-  }
+
 
   footer{
     text-align:center;
@@ -212,16 +199,6 @@
   </footer>
 </div>
 
-<div class="player-bar" id="playerBar">
-  <button class="p-toggle" id="pToggle">⏸</button>
-  <div class="p-info">
-    <div class="p-title" id="pTitle"></div>
-    <div class="p-sub" id="pSub"></div>
-  </div>
-  <button class="p-close" id="pClose">✕</button>
-  <audio id="audioEl"></audio>
-</div>
-
 <script>
 const API_RECITERS = "https://www.mp3quran.net/api/v3/reciters?language=ar";
 let reciters = [];
@@ -250,6 +227,7 @@ async function loadReciters(){
 
 function renderResults(){
   resultsEl.innerHTML = '';
+  openRow = null;
   if(!selectedReciter){
     statusEl.textContent = "اختر قارئًا لعرض السور المتاحة لديه.";
     return;
@@ -279,64 +257,60 @@ function renderResults(){
     const row = document.createElement('div');
     row.className = 'row';
     row.innerHTML = `
-      <div class="info">
-        <span class="surah-name">سورة ${s.name}</span>
-        <span class="reciter-name">${selectedReciter.name} — ${moshaf.name}</span>
+      <div class="row-top">
+        <div class="info">
+          <span class="surah-name">سورة ${s.name}</span>
+          <span class="reciter-name">${selectedReciter.name} — ${moshaf.name}</span>
+        </div>
+        <div class="btn-group">
+          <button class="listen-btn" data-url="${url}">استماع</button>
+          <a class="dl-btn" href="download.html?url=${encodeURIComponent(url)}&name=${encodeURIComponent('سورة ' + s.name)}&reciter=${encodeURIComponent(selectedReciter.name)}">تحميل</a>
+        </div>
       </div>
-      <div class="btn-group">
-        <button class="listen-btn" data-url="${url}" data-title="سورة ${s.name}" data-sub="${selectedReciter.name}">استماع</button>
-        <a class="dl-btn" href="download.html?url=${encodeURIComponent(url)}&name=${encodeURIComponent('سورة ' + s.name)}&reciter=${encodeURIComponent(selectedReciter.name)}">تحميل</a>
+      <div class="audio-wrap">
+        <audio controls preload="none"></audio>
       </div>
     `;
     resultsEl.appendChild(row);
   });
 }
 
-// Mini audio player
-const audioEl = document.getElementById('audioEl');
-const playerBar = document.getElementById('playerBar');
-const pToggle = document.getElementById('pToggle');
-const pTitle = document.getElementById('pTitle');
-const pSub = document.getElementById('pSub');
-const pClose = document.getElementById('pClose');
-let activeBtn = null;
-
-function setActiveButton(btn){
-  if(activeBtn && activeBtn !== btn) activeBtn.classList.remove('playing');
-  activeBtn = btn;
-  if(btn) btn.classList.add('playing');
-}
+// Inline expanding player: tapping "استماع" opens a native audio bar under that row
+let openRow = null;
 
 resultsEl.addEventListener('click', (e) => {
   const btn = e.target.closest('.listen-btn');
   if(!btn) return;
-  const url = btn.dataset.url;
-  if(activeBtn === btn){
-    // toggle play/pause on the same track
-    if(audioEl.paused){ audioEl.play(); } else { audioEl.pause(); }
+  const row = btn.closest('.row');
+  const wrap = row.querySelector('.audio-wrap');
+  const audio = wrap.querySelector('audio');
+
+  if(openRow && openRow !== row){
+    // close whichever row was open before
+    const prevAudio = openRow.querySelector('audio');
+    prevAudio.pause();
+    prevAudio.removeAttribute('src');
+    prevAudio.load();
+    openRow.querySelector('.audio-wrap').classList.remove('open');
+    openRow.querySelector('.listen-btn').classList.remove('playing');
+  }
+
+  if(wrap.classList.contains('open')){
+    // same row tapped again: close it
+    audio.pause();
+    audio.removeAttribute('src');
+    audio.load();
+    wrap.classList.remove('open');
+    btn.classList.remove('playing');
+    openRow = null;
     return;
   }
-  audioEl.src = url;
-  audioEl.play();
-  pTitle.textContent = btn.dataset.title;
-  pSub.textContent = btn.dataset.sub;
-  playerBar.classList.add('active');
-  setActiveButton(btn);
-});
 
-audioEl.addEventListener('play', () => { pToggle.textContent = '⏸'; if(activeBtn) activeBtn.classList.add('playing'); });
-audioEl.addEventListener('pause', () => { pToggle.textContent = '▶'; });
-audioEl.addEventListener('ended', () => { pToggle.textContent = '▶'; });
-
-pToggle.addEventListener('click', () => {
-  if(audioEl.paused){ audioEl.play(); } else { audioEl.pause(); }
-});
-
-pClose.addEventListener('click', () => {
-  audioEl.pause();
-  audioEl.src = '';
-  playerBar.classList.remove('active');
-  setActiveButton(null);
+  if(!audio.src){ audio.src = btn.dataset.url; }
+  wrap.classList.add('open');
+  btn.classList.add('playing');
+  audio.play();
+  openRow = row;
 });
 
 reciterSelect.addEventListener('change', () => {
