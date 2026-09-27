@@ -26,7 +26,7 @@
     font-family: 'Tajawal', sans-serif;
     min-height:100vh;
   }
-  .wrap{max-width: 760px; margin: 0 auto; padding: 48px 20px 80px;}
+  .wrap{max-width: 760px; margin: 0 auto; padding: 48px 20px 120px;}
 
   header{text-align:center; margin-bottom: 40px;}
   .kicker{
@@ -106,8 +106,9 @@
   .row .info{display:flex; flex-direction:column; gap:4px;}
   .row .surah-name{font-size:17px; font-weight:700;}
   .row .reciter-name{font-size:13px; color: var(--muted);}
+  .btn-group{display:flex; gap:8px; flex-shrink:0;}
+
   .dl-btn{
-    flex-shrink:0;
     background: linear-gradient(180deg, var(--gold-soft), var(--gold));
     color: #1a1207;
     text-decoration:none;
@@ -118,6 +119,59 @@
     white-space:nowrap;
   }
   .dl-btn:active{transform: translateY(1px);}
+
+  .listen-btn{
+    background: transparent;
+    color: var(--gold-soft);
+    border: 1px solid var(--gold-soft);
+    font-weight:700;
+    font-size: 14px;
+    padding: 10px 16px;
+    border-radius: 999px;
+    white-space:nowrap;
+    font-family:'Tajawal', sans-serif;
+    cursor:pointer;
+  }
+  .listen-btn.playing{
+    background: var(--gold-soft);
+    color: #1a1207;
+  }
+  .listen-btn:active{transform: translateY(1px);}
+
+  .player-bar{
+    position: fixed;
+    left: 0; right: 0; bottom: 0;
+    background: var(--panel);
+    border-top: 1px solid var(--line);
+    padding: 12px 16px calc(12px + env(safe-area-inset-bottom, 0px));
+    display:none;
+    align-items:center;
+    gap: 12px;
+    z-index: 10;
+  }
+  .player-bar.active{display:flex;}
+  .player-bar .p-info{flex:1; min-width:0;}
+  .player-bar .p-title{font-size:14px; font-weight:700; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;}
+  .player-bar .p-sub{font-size:12px; color: var(--muted);}
+  .player-bar .p-toggle{
+    flex-shrink:0;
+    width:40px; height:40px;
+    border-radius:50%;
+    border:none;
+    background: var(--gold-soft);
+    color:#1a1207;
+    font-size:16px;
+    cursor:pointer;
+  }
+  .player-bar .p-close{
+    flex-shrink:0;
+    background:none;
+    border:none;
+    color: var(--muted);
+    font-size:20px;
+    cursor:pointer;
+    padding: 6px;
+  }
 
   footer{
     text-align:center;
@@ -156,6 +210,16 @@
     الملفات الصوتية مقدَّمة عبر روابط القراء المتاحة على mp3quran.net<br>
     كل تلاوة صدقة جارية لصاحبها، سائلين الله أن يجعل هذا العمل في ميزان حسنات القائمين عليه.
   </footer>
+</div>
+
+<div class="player-bar" id="playerBar">
+  <button class="p-toggle" id="pToggle">⏸</button>
+  <div class="p-info">
+    <div class="p-title" id="pTitle"></div>
+    <div class="p-sub" id="pSub"></div>
+  </div>
+  <button class="p-close" id="pClose">✕</button>
+  <audio id="audioEl"></audio>
 </div>
 
 <script>
@@ -219,11 +283,61 @@ function renderResults(){
         <span class="surah-name">سورة ${s.name}</span>
         <span class="reciter-name">${selectedReciter.name} — ${moshaf.name}</span>
       </div>
-      <a class="dl-btn" href="download.html?url=${encodeURIComponent(url)}&name=${encodeURIComponent('سورة ' + s.name)}&reciter=${encodeURIComponent(selectedReciter.name)}">تحميل</a>
+      <div class="btn-group">
+        <button class="listen-btn" data-url="${url}" data-title="سورة ${s.name}" data-sub="${selectedReciter.name}">استماع</button>
+        <a class="dl-btn" href="download.html?url=${encodeURIComponent(url)}&name=${encodeURIComponent('سورة ' + s.name)}&reciter=${encodeURIComponent(selectedReciter.name)}">تحميل</a>
+      </div>
     `;
     resultsEl.appendChild(row);
   });
 }
+
+// Mini audio player
+const audioEl = document.getElementById('audioEl');
+const playerBar = document.getElementById('playerBar');
+const pToggle = document.getElementById('pToggle');
+const pTitle = document.getElementById('pTitle');
+const pSub = document.getElementById('pSub');
+const pClose = document.getElementById('pClose');
+let activeBtn = null;
+
+function setActiveButton(btn){
+  if(activeBtn && activeBtn !== btn) activeBtn.classList.remove('playing');
+  activeBtn = btn;
+  if(btn) btn.classList.add('playing');
+}
+
+resultsEl.addEventListener('click', (e) => {
+  const btn = e.target.closest('.listen-btn');
+  if(!btn) return;
+  const url = btn.dataset.url;
+  if(activeBtn === btn){
+    // toggle play/pause on the same track
+    if(audioEl.paused){ audioEl.play(); } else { audioEl.pause(); }
+    return;
+  }
+  audioEl.src = url;
+  audioEl.play();
+  pTitle.textContent = btn.dataset.title;
+  pSub.textContent = btn.dataset.sub;
+  playerBar.classList.add('active');
+  setActiveButton(btn);
+});
+
+audioEl.addEventListener('play', () => { pToggle.textContent = '⏸'; if(activeBtn) activeBtn.classList.add('playing'); });
+audioEl.addEventListener('pause', () => { pToggle.textContent = '▶'; });
+audioEl.addEventListener('ended', () => { pToggle.textContent = '▶'; });
+
+pToggle.addEventListener('click', () => {
+  if(audioEl.paused){ audioEl.play(); } else { audioEl.pause(); }
+});
+
+pClose.addEventListener('click', () => {
+  audioEl.pause();
+  audioEl.src = '';
+  playerBar.classList.remove('active');
+  setActiveButton(null);
+});
 
 reciterSelect.addEventListener('change', () => {
   const idx = reciterSelect.value;
