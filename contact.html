@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>تواصل معنا — تلاوتي</title>
+<meta name="description" content="تواصل معنا للإبلاغ عن مشكلة في الموقع أو رابط تحميل لا يعمل، أو لأي استفسار آخر.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='20' fill='%230f2b28'/%3E%3Ctext x='50' y='68' font-size='55' text-anchor='middle'%3E%F0%9F%93%96%3C/text%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Reem+Kufi:wght@400..700&family=Tajawal:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg: #0f2b28; --bg-2: #123833; --panel: #16403a;
+    --gold: #c9a24b; --gold-soft: #e4c979; --cream: #f6f1e4;
+    --muted: #a9c2bc; --line: rgba(246,241,228,0.12);
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background: radial-gradient(1200px 600px at 50% -10%, var(--bg-2), var(--bg) 60%);
+    color: var(--cream); font-family: 'Tajawal', sans-serif; min-height:100vh;
+  }
+  .wrap{max-width: 640px; margin: 0 auto; padding: 48px 20px 80px;}
+  .kicker{font-family:'Reem Kufi', sans-serif; color: var(--gold-soft); font-size: 15px; margin: 0 0 10px; text-align:center;}
+  h1{font-family:'Reem Kufi', sans-serif; font-size: clamp(26px, 5vw, 36px); margin: 0 0 14px; text-align:center; line-height:1.4;}
+  .intro{color: var(--muted); text-align:center; max-width: 460px; margin: 0 auto 32px; line-height:1.8;}
+
+  .panel{
+    background: var(--panel); border: 1px solid var(--line); border-radius: 18px;
+    padding: 24px; box-shadow: 0 20px 50px rgba(0,0,0,0.35);
+  }
+  .panel h2{font-size:17px; margin: 0 0 10px; color: var(--gold-soft);}
+  .panel p{color: var(--cream); line-height:1.9; margin: 0 0 18px; font-size:15px;}
+
+  .field{margin-bottom: 14px;}
+  label{display:block; font-size: 14px; color: var(--gold-soft); margin-bottom: 6px;}
+  input, textarea, select{
+    width:100%; background: var(--bg); border: 1px solid var(--line); color: var(--cream);
+    padding: 12px 14px; border-radius: 10px; font-family:'Tajawal', sans-serif; font-size: 15px;
+  }
+  textarea{min-height: 110px; resize: vertical;}
+  input:focus, textarea:focus, select:focus{outline: none; border-color: var(--gold);}
+
+  .send-btn{
+    display:inline-flex; align-items:center; justify-content:center; width:100%;
+    background: linear-gradient(180deg, var(--gold-soft), var(--gold)); color: #1a1207;
+    text-decoration:none; font-weight:700; font-size: 16px; padding: 14px;
+    border-radius: 12px; border:none; cursor:pointer; margin-top: 6px;
+  }
+
+  .email-line{
+    text-align:center; margin-top: 22px; color: var(--muted); font-size: 14px;
+  }
+  .email-line a{color: var(--gold-soft); text-decoration:none;}
+
+  .back-link{display:block; text-align:center; margin-top: 24px; color: var(--muted); font-size: 13px; text-decoration:none;}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <p class="kicker">تلاوتي</p>
+  <h1>تواصل معنا</h1>
+  <p class="intro">لو لقيت رابط تحميل معطّل، أو مشكلة في الموقع، أو عندك اقتراح، ابعتلنا وهنرد عليك في أقرب وقت بإذن الله.</p>
+
+  <div class="panel">
+    <h2>الإبلاغ عن مشكلة أو التواصل</h2>
+    <p>املأ البيانات دي، وهتفتح لك رسالة إيميل جاهزة تدوس بس "إرسال".</p>
+
+    <form id="contactForm">
+      <div class="field">
+        <label for="subject">نوع الرسالة</label>
+        <select id="subject">
+          <option value="رابط تحميل لا يعمل">رابط تحميل لا يعمل</option>
+          <option value="مشكلة تقنية في الموقع">مشكلة تقنية في الموقع</option>
+          <option value="اقتراح لتطوير الموقع">اقتراح لتطوير الموقع</option>
+          <option value="استفسار عام">استفسار عام</option>
+          <option value="أخرى">أخرى</option>
+        </select>
+      </div>
+      <div class="field">
+        <label for="msg">تفاصيل الرسالة</label>
+        <textarea id="msg" placeholder="اكتب التفاصيل هنا... (مثلًا: اسم السورة والقارئ لو الرابط معطّل)"></textarea>
+      </div>
+      <button type="submit" class="send-btn">إرسال عبر البريد الإلكتروني</button>
+    </form>
+
+    <p class="email-line">أو راسلنا مباشرة على: <a href="mailto:talawaty998@gmail.com">talawaty998@gmail.com</a></p>
+  </div>
+
+  <a class="back-link" href="index.html">رجوع للصفحة الرئيسية</a>
+</div>
+
+<script>
+document.getElementById('contactForm').addEventListener('submit', function(e){
+  e.preventDefault();
+  const subject = document.getElementById('subject').value;
+  const msg = document.getElementById('msg').value || '(لم يُكتب تفاصيل)';
+  const mailto = `mailto:talawaty998@gmail.com?subject=${encodeURIComponent('تلاوتي - ' + subject)}&body=${encodeURIComponent(msg)}`;
+  window.location.href = mailto;
+});
+</script>
+</body>
+</html>
