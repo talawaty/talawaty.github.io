@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>جارٍ تجهيز التحميل…</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Reem+Kufi:wght@400..700&family=Tajawal:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg: #0f2b28;
+    --bg-2: #123833;
+    --panel: #16403a;
+    --gold: #c9a24b;
+    --gold-soft: #e4c979;
+    --cream: #f6f1e4;
+    --muted: #a9c2bc;
+    --line: rgba(246,241,228,0.12);
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    background: radial-gradient(1200px 600px at 50% -10%, var(--bg-2), var(--bg) 60%);
+    color: var(--cream);
+    font-family: 'Tajawal', sans-serif;
+    min-height:100vh;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    padding: 24px;
+  }
+  .card{
+    max-width: 480px;
+    width:100%;
+    background: var(--panel);
+    border: 1px solid var(--line);
+    border-radius: 18px;
+    padding: 28px;
+    text-align:center;
+    box-shadow: 0 20px 50px rgba(0,0,0,0.35);
+  }
+  .kicker{
+    font-family:'Reem Kufi', sans-serif;
+    color: var(--gold-soft);
+    font-size: 14px;
+    margin: 0 0 6px;
+  }
+  h1{
+    font-family:'Reem Kufi', sans-serif;
+    font-size: 22px;
+    margin: 0 0 4px;
+  }
+  .reciter{
+    color: var(--muted);
+    font-size: 14px;
+    margin: 0 0 22px;
+  }
+
+  /* Ad placeholder: replace this box's inner HTML with your ad network's embed code */
+  .ad-slot{
+    background: var(--bg);
+    border: 1px dashed var(--line);
+    border-radius: 12px;
+    min-height: 250px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    color: var(--muted);
+    font-size: 13px;
+    margin-bottom: 22px;
+  }
+
+  .continue-btn{
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+    width:100%;
+    background: linear-gradient(180deg, var(--gold-soft), var(--gold));
+    color: #1a1207;
+    text-decoration:none;
+    font-weight:700;
+    font-size: 16px;
+    padding: 14px;
+    border-radius: 12px;
+    border:none;
+    cursor:pointer;
+    opacity:0.5;
+    pointer-events:none;
+    transition: opacity 0.2s;
+  }
+  .continue-btn.ready{
+    opacity:1;
+    pointer-events:auto;
+  }
+
+  .back-link{
+    display:block;
+    margin-top: 16px;
+    color: var(--muted);
+    font-size: 13px;
+    text-decoration:none;
+  }
+</style>
+</head>
+<body>
+  <div class="card">
+    <p class="kicker">جارٍ التجهيز</p>
+    <h1 id="surahTitle">السورة</h1>
+    <p class="reciter" id="reciterName"></p>
+
+    <!-- AD PLACEHOLDER: paste your ad network's script/embed code inside this div -->
+    <div class="ad-slot" id="adSlot">مساحة إعلانية</div>
+
+    <button class="continue-btn" id="continueBtn">متابعة (5)</button>
+    <a class="back-link" href="index.html">رجوع للبحث</a>
+  </div>
+
+<script>
+const params = new URLSearchParams(window.location.search);
+const fileUrl = params.get('url');
+const name = params.get('name') || 'الملف';
+const reciter = params.get('reciter') || '';
+
+document.getElementById('surahTitle').textContent = name;
+document.getElementById('reciterName').textContent = reciter;
+document.title = name + " — تحميل";
+
+const btn = document.getElementById('continueBtn');
+
+if(!fileUrl){
+  btn.textContent = "الرابط غير متاح";
+}else{
+  let seconds = 5;
+  btn.textContent = `متابعة (${seconds})`;
+  const timer = setInterval(() => {
+    seconds -= 1;
+    if(seconds <= 0){
+      clearInterval(timer);
+      btn.textContent = "متابعة والتحميل الآن";
+      btn.classList.add('ready');
+    }else{
+      btn.textContent = `متابعة (${seconds})`;
+    }
+  }, 1000);
+
+  btn.addEventListener('click', () => {
+    if(!btn.classList.contains('ready')) return;
+    window.location.href = fileUrl;
+  });
+}
+</script>
+</body>
+</html>
