@@ -21,6 +21,28 @@
     background: radial-gradient(1200px 600px at 50% -10%, var(--bg-2), var(--bg) 60%);
     color: var(--cream); font-family: 'Tajawal', sans-serif; min-height:100vh;
   }
+  .topnav{
+    display:flex; justify-content:center; gap: 8px;
+    margin-bottom: 28px;
+  }
+  .topnav a{
+    background: var(--panel);
+    border: 1px solid var(--line);
+    color: var(--muted);
+    text-decoration:none;
+    font-size: 14px;
+    font-weight:700;
+    padding: 10px 18px;
+    border-radius: 999px;
+    transition: transform 0.12s ease, background 0.15s ease, color 0.15s ease;
+  }
+  .topnav a:active{ transform: scale(0.94); }
+  .topnav a.active{
+    background: linear-gradient(180deg, var(--gold-soft), var(--gold));
+    color: #1a1207;
+    border-color: transparent;
+  }
+
   .wrap{max-width: 640px; margin: 0 auto; padding: 48px 20px 80px;}
   .kicker{font-family:'Reem Kufi', sans-serif; color: var(--gold-soft); font-size: 15px; margin: 0 0 10px; text-align:center;}
   h1{font-family:'Reem Kufi', sans-serif; font-size: clamp(26px, 5vw, 36px); margin: 0 0 30px; text-align:center; line-height:1.4;}
@@ -38,6 +60,11 @@
 </head>
 <body>
 <div class="wrap">
+  <nav class="topnav">
+    <a href="index.html">الرئيسية</a>
+    <a href="about.html" class="active">من نحن</a>
+    <a href="contact.html">تواصل معنا</a>
+  </nav>
   <p class="kicker">تلاوتي</p>
   <h1>من نحن</h1>
 

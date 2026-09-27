@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>تلاوتي — تحميل القرآن الكريم بصوت أكثر من قارئ</title>
+<title>تلاوتي</title>
 <meta name="description" content="حمّل أو استمع للقرآن الكريم كاملًا بصوت نخبة من القراء. ابحث عن السورة أو القارئ، واستمع مباشرة أو نزّل الملف الصوتي على جهازك مجانًا.">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='20' fill='%230f2b28'/%3E%3Ctext x='50' y='68' font-size='55' text-anchor='middle'%3E%F0%9F%93%96%3C/text%3E%3C/svg%3E">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -28,6 +28,28 @@
     font-family: 'Tajawal', sans-serif;
     min-height:100vh;
   }
+  .topnav{
+    display:flex; justify-content:center; gap: 8px;
+    margin-bottom: 28px;
+  }
+  .topnav a{
+    background: var(--panel);
+    border: 1px solid var(--line);
+    color: var(--muted);
+    text-decoration:none;
+    font-size: 14px;
+    font-weight:700;
+    padding: 10px 18px;
+    border-radius: 999px;
+    transition: transform 0.12s ease, background 0.15s ease, color 0.15s ease;
+  }
+  .topnav a:active{ transform: scale(0.94); }
+  .topnav a.active{
+    background: linear-gradient(180deg, var(--gold-soft), var(--gold));
+    color: #1a1207;
+    border-color: transparent;
+  }
+
   .wrap{max-width: 760px; margin: 0 auto; padding: 48px 20px 80px;}
 
   header{text-align:center; margin-bottom: 40px;}
@@ -173,6 +195,11 @@
 </head>
 <body>
 <div class="wrap">
+  <nav class="topnav">
+    <a href="index.html" class="active">الرئيسية</a>
+    <a href="about.html">من نحن</a>
+    <a href="contact.html">تواصل معنا</a>
+  </nav>
   <header>
     <p class="kicker">القرآن الكريم</p>
     <h1>ابحث عن سورتك، واختر قارئك، ونزّلها مباشرة</h1>
@@ -211,10 +238,6 @@
   <footer>
     الملفات الصوتية مقدَّمة عبر روابط القراء المتاحة على mp3quran.net<br>
     كل تلاوة صدقة جارية لصاحبها، سائلين الله أن يجعل هذا العمل في ميزان حسنات القائمين عليه.
-    <br><br>
-    <a href="about.html" style="color: var(--gold-soft); text-decoration:none;">من نحن</a>
-    &nbsp;•&nbsp;
-    <a href="contact.html" style="color: var(--gold-soft); text-decoration:none;">تواصل معنا</a>
   </footer>
 </div>
 
