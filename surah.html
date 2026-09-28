@@ -4,7 +4,11 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>سورة — تلاوتي</title>
-<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='20' fill='%230f2b28'/%3E%3Ctext x='50' y='68' font-size='55' text-anchor='middle'%3E%F0%9F%93%96%3C/text%3E%3C/svg%3E">
+<meta name="description" content="استمع وحمّل سور القرآن الكريم بصوت نخبة من القراء، مع التفسير الميسّر آية بآية — تلاوتي.">
+<meta property="og:site_name" content="تلاوتي">
+<meta property="og:image" content="https://talawaty.github.io/logo.png">
+<link rel="icon" type="image/png" sizes="192x192" href="favicon.png">
+<link rel="apple-touch-icon" href="logo.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Reem+Kufi:wght@400..700&family=Tajawal:wght@400;500;700&display=swap" rel="stylesheet">
@@ -31,12 +35,17 @@
   .panel{background:var(--panel);border:1px solid var(--line);border-radius:18px;padding:22px;margin-bottom:16px;}
   .panel h2{font-size:16px;color:var(--gold-soft);margin:0 0 12px;}
   .reciter{color:var(--muted);font-size:14px;margin-bottom:14px;}
+  .hint{color:var(--gold-soft);font-size:13px;margin:-4px 0 12px;}
+  .hint[hidden]{display:none;}
   audio{width:100%;height:40px;margin-bottom:14px;}
   .btns{display:flex;gap:10px;}
   .btn{flex:1;text-align:center;text-decoration:none;font-weight:700;padding:13px;border-radius:12px;font-size:15px;font-family:'Tajawal',sans-serif;}
   .btn.gold{background:linear-gradient(180deg,var(--gold-soft),var(--gold));color:#1a1207;}
   .btn.line{border:1px solid var(--gold-soft);color:var(--gold-soft);}
   .btn:active{transform:scale(.97);}
+  .mini-row{display:flex;justify-content:center;margin-top:14px;}
+  .mini-btn{font-size:13px;font-weight:700;padding:8px 16px;border-radius:999px;border:1px dashed var(--gold-soft);color:var(--gold-soft);text-decoration:none;}
+  .mini-btn:active{transform:scale(.96);}
   .nav-surah{display:flex;justify-content:space-between;margin-top:8px;}
   .nav-surah a{color:var(--muted);text-decoration:none;font-size:14px;}
 </style>
@@ -59,10 +68,14 @@
   <div class="panel" id="listenPanel">
     <h2>الاستماع والتحميل</h2>
     <div class="reciter" id="reciterLine"></div>
+    <div class="hint" id="resumeHint" hidden></div>
     <audio id="audio" controls controlsList="nodownload" oncontextmenu="return false" preload="none"></audio>
     <div class="btns">
       <a class="btn gold" id="dlBtn" href="#">تحميل</a>
       <a class="btn line" id="tafsirBtn" href="#">التفسير آية بآية</a>
+    </div>
+    <div class="mini-row">
+      <a class="mini-btn" id="pdfBtn" href="#">📄 تحميل التفسير PDF</a>
     </div>
   </div>
 
@@ -79,23 +92,79 @@ const AYAHS=[7,286,200,176,120,165,206,75,129,109,123,111,43,52,99,128,111,110,9
 const p=new URLSearchParams(location.search);
 const n=Math.min(114,Math.max(1,parseInt(p.get('number'),10)||1));
 const name=SURAHS[n-1];
+const rid=p.get('rid')||'';
 const reciter=p.get('reciter')||'';
 const moshaf=p.get('moshaf')||'';
 const url=p.get('url')||'';
 
-document.title='سورة '+name+' — تلاوتي';
+function fmt(sec){ sec=Math.floor(sec||0); return Math.floor(sec/60)+':'+String(sec%60).padStart(2,'0'); }
+
+document.title='سورة '+name+' — تحميل واستماع | تلاوتي';
 document.getElementById('sName').textContent='سورة '+name;
 document.getElementById('sMeta').textContent='رقمها '+n+' في المصحف • عدد آياتها '+AYAHS[n-1];
 
-const tafsirLink='tafsir.html?number='+n;
-document.getElementById('tafsirBtn').href=tafsirLink;
+// search-engine friendly description + canonical (one canonical page per surah)
+(function(){
+  let m=document.querySelector('meta[name="description"]');
+  if(!m){m=document.createElement('meta');m.name='description';document.head.appendChild(m);}
+  m.content='استمع وحمّل سورة '+name+' ('+AYAHS[n-1]+' آية) بصوت نخبة من القراء، واقرأ تفسيرها الميسّر آية بآية — تلاوتي.';
+  let c=document.querySelector('link[rel="canonical"]');
+  if(!c){c=document.createElement('link');c.rel='canonical';document.head.appendChild(c);}
+  c.href=new URL('surah.html?number='+n, location.href).href;
+})();
+
+document.getElementById('tafsirBtn').href='tafsir.html?number='+n;
+document.getElementById('pdfBtn').href='download.html?go='+encodeURIComponent('tafsir.html?number='+n+'&pdf=1')+
+  '&name='+encodeURIComponent('تفسير سورة '+name+' (PDF)')+'&reciter='+encodeURIComponent('التفسير الميسّر');
+
+const audio=document.getElementById('audio');
+const LAST_KEY='talawaty_last';
 
 if(url){
-  document.getElementById('reciterLine').textContent=reciter+(moshaf?' — '+moshaf:'');
-  document.getElementById('audio').src=url;
+  const rl=document.getElementById('reciterLine');
+  if(rid){
+    const a=document.createElement('a');
+    a.href='reciter.html?id='+encodeURIComponent(rid);
+    a.textContent=reciter; a.style.color='inherit';
+    rl.appendChild(a);
+  }else{
+    rl.appendChild(document.createTextNode(reciter));
+  }
+  if(moshaf) rl.appendChild(document.createTextNode(' — '+moshaf));
+  audio.src=url;
   document.getElementById('dlBtn').href='download.html?url='+encodeURIComponent(url)+'&name='+encodeURIComponent('سورة '+name)+'&reciter='+encodeURIComponent(reciter);
+
+  // ---- remember position / resume ----
+  const info={number:n,name:name,rid:rid,reciter:reciter,moshaf:moshaf,url:url};
+  let resumeAt=0, restored=false, lastTick=0;
+  try{
+    const l=JSON.parse(localStorage.getItem(LAST_KEY)||'null');
+    if(l && l.url===url && l.time>3) resumeAt=l.time;
+  }catch(e){}
+  if(resumeAt>3){
+    const h=document.getElementById('resumeHint');
+    h.textContent='آخر مرة توقفت عند '+fmt(resumeAt)+' — سيكمل من هناك.';
+    h.hidden=false;
+  }
+  function save(t){
+    try{localStorage.setItem(LAST_KEY, JSON.stringify(Object.assign({},info,{time:t,ts:Date.now()})));}catch(e){}
+  }
+  audio.addEventListener('loadedmetadata',()=>{
+    if(resumeAt>3 && !restored && (!isFinite(audio.duration) || resumeAt<audio.duration-5)){
+      audio.currentTime=resumeAt; restored=true;
+    }
+  });
+  audio.addEventListener('play',()=>{ save((restored||!resumeAt)?audio.currentTime:resumeAt); });
+  audio.addEventListener('timeupdate',()=>{
+    const now=Date.now();
+    if(now-lastTick<5000) return;
+    lastTick=now;
+    if(!restored && resumeAt>3) return;
+    save(audio.currentTime);
+  });
+  audio.addEventListener('ended',()=>{ save(0); });
 }else{
-  document.getElementById('listenPanel').querySelector('audio').style.display='none';
+  audio.style.display='none';
   document.getElementById('reciterLine').textContent='اختر قارئًا من الصفحة الرئيسية للاستماع والتحميل.';
   document.getElementById('dlBtn').href='index.html';
   document.getElementById('dlBtn').textContent='اختر قارئًا';

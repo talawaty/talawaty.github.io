@@ -12,7 +12,10 @@
 <script type="application/ld+json">
 {"@context":"https://schema.org","@type":"WebSite","name":"تلاوتي","alternateName":["Talawaty","تلاوتي - تحميل القرآن الكريم"],"url":"https://talawaty.github.io/"}
 </script>
-<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='20' fill='%230f2b28'/%3E%3Ctext x='50' y='68' font-size='55' text-anchor='middle'%3E%F0%9F%93%96%3C/text%3E%3C/svg%3E">
+<link rel="icon" type="image/png" sizes="192x192" href="favicon.png">
+<link rel="apple-touch-icon" href="logo.png">
+<meta property="og:image" content="https://talawaty.github.io/logo.png">
+<meta property="og:description" content="حمّل أو استمع للقرآن الكريم بصوت نخبة من القراء، مع التفسير الميسّر آية بآية.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Reem+Kufi:wght@400..700&family=Tajawal:wght@400;500;700&display=swap" rel="stylesheet">
@@ -196,7 +199,18 @@
   }
   .listen-btn:active{transform: translateY(1px);}
 
-
+  .row-top{flex-wrap:wrap;}
+  .row .info{flex:1 1 150px; min-width:0;}
+  .btn-group{align-items:center;}
+  .share-btn{flex-shrink:0;width:40px;height:40px;border-radius:50%;border:none;background:#25D366;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;padding:0;}
+  .share-btn:active{transform:scale(.92);}
+  .reciter-name a{color:inherit; text-decoration:underline dotted; text-underline-offset:3px;}
+  .resume{display:flex;align-items:center;justify-content:space-between;gap:12px;background:var(--panel);border:1px solid var(--gold);border-radius:14px;padding:14px 16px;margin-bottom:18px;}
+  .resume[hidden]{display:none;}
+  .resume-text{display:flex;flex-direction:column;gap:4px;min-width:0;}
+  .resume-k{font-size:12px;color:var(--gold-soft);}
+  .resume-t{font-size:15px;font-weight:700;}
+  .resume-btn{flex-shrink:0;background:linear-gradient(180deg,var(--gold-soft),var(--gold));color:#1a1207;text-decoration:none;font-weight:700;font-size:14px;padding:10px 18px;border-radius:999px;}
 
   footer{
     text-align:center;
@@ -221,12 +235,21 @@
     <p>اكتب اسم السورة أو اسم الشيخ، اختر من النتائج، وحمّل الملف الصوتي على جهازك.</p>
   </header>
 
+  <div class="resume" id="resume" hidden>
+    <div class="resume-text">
+      <span class="resume-k">آخر ما استمعت له</span>
+      <span class="resume-t" id="resumeTitle"></span>
+    </div>
+    <a class="resume-btn" id="resumeLink" href="#">تابع</a>
+  </div>
+
   <div class="search-panel">
     <div class="field">
       <label for="reciter">القارئ</label>
       <select id="reciter">
         <option value="">جارِ تحميل القراء…</option>
       </select>
+      <a href="reciter.html" style="display:inline-block;margin-top:10px;color:var(--gold-soft);font-size:13px;text-decoration:none;">تصفّح كل القراء ←</a>
     </div>
     <div class="field">
       <label for="surah">السورة</label>
@@ -258,6 +281,36 @@ const resultsEl = document.getElementById('results');
 // Surah names 1-114, Arabic
 const SURAHS = ["الفاتحة","البقرة","آل عمران","النساء","المائدة","الأنعام","الأعراف","الأنفال","التوبة","يونس","هود","يوسف","الرعد","إبراهيم","الحجر","النحل","الإسراء","الكهف","مريم","طه","الأنبياء","الحج","المؤمنون","النور","الفرقان","الشعراء","النمل","القصص","العنكبوت","الروم","لقمان","السجدة","الأحزاب","سبأ","فاطر","يس","الصافات","ص","الزمر","غافر","فصلت","الشورى","الزخرف","الدخان","الجاثية","الأحقاف","محمد","الفتح","الحجرات","ق","الذاريات","الطور","النجم","القمر","الرحمن","الواقعة","الحديد","المجادلة","الحشر","الممتحنة","الصف","الجمعة","المنافقون","التغابن","الطلاق","التحريم","الملك","القلم","الحاقة","المعارج","نوح","الجن","المزمل","المدثر","القيامة","الإنسان","المرسلات","النبأ","النازعات","عبس","التكوير","الانفطار","المطففين","الانشقاق","البروج","الطارق","الأعلى","الغاشية","الفجر","البلد","الشمس","الليل","الضحى","الشرح","التين","العلق","القدر","البينة","الزلزلة","العاديات","القارعة","التكاثر","العصر","الهمزة","الفيل","قريش","الماعون","الكوثر","الكافرون","النصر","المسد","الإخلاص","الفلق","الناس"];
 
+// ---------- helpers ----------
+function norm(t){
+  return (t||'').replace(/[\u064B-\u065F\u0670\u0640]/g,'')
+    .replace(/[أإآٱ]/g,'ا').replace(/ة/g,'ه').replace(/ى/g,'ي').replace(/ؤ/g,'و').replace(/ئ/g,'ي')
+    .trim().toLowerCase();
+}
+const esc = v => String(v).replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+function surahLink(o){
+  return 'surah.html?number='+o.number+'&rid='+encodeURIComponent(o.rid===undefined||o.rid===null?'':o.rid)+
+    '&reciter='+encodeURIComponent(o.reciter)+'&moshaf='+encodeURIComponent(o.moshaf)+'&url='+encodeURIComponent(o.url);
+}
+function shareWA(o){
+  const link = new URL(surahLink(o), location.href).href;
+  const text = 'سورة '+o.name+' بصوت '+o.reciter+'\nاستمع وحمّل من تلاوتي:\n'+link;
+  window.open('https://wa.me/?text='+encodeURIComponent(text),'_blank');
+}
+const LAST_KEY='talawaty_last';
+function saveLast(o){ try{localStorage.setItem(LAST_KEY, JSON.stringify(o));}catch(e){} }
+function getLast(){ try{return JSON.parse(localStorage.getItem(LAST_KEY)||'null');}catch(e){return null;} }
+function fmt(sec){ sec=Math.floor(sec||0); return Math.floor(sec/60)+':'+String(sec%60).padStart(2,'0'); }
+function showResume(){
+  const l=getLast(); if(!l||!l.url||!l.number) return;
+  let t='سورة '+l.name+' — '+l.reciter;
+  if(l.time>5) t+=' (توقفت عند '+fmt(l.time)+')';
+  document.getElementById('resumeTitle').textContent=t;
+  document.getElementById('resumeLink').href=surahLink(l);
+  document.getElementById('resume').hidden=false;
+}
+showResume();
+
 async function loadReciters(){
   try{
     const res = await fetch(API_RECITERS);
@@ -284,12 +337,12 @@ function renderResults(){
     return;
   }
   const availableNums = moshaf.surah_list.split(',').map(n => parseInt(n,10));
-  const query = surahInput.value.trim();
+  const query = norm(surahInput.value).replace(/^سوره\s*/, '');
 
   const matches = SURAHS
     .map((name,idx) => ({num: idx+1, name}))
     .filter(s => availableNums.includes(s.num))
-    .filter(s => !query || s.name.includes(query));
+    .filter(s => !query || norm(s.name).includes(query));
 
   if(matches.length === 0){
     statusEl.textContent = "لا توجد نتائج مطابقة.";
@@ -297,20 +350,26 @@ function renderResults(){
   }
   statusEl.textContent = `${matches.length} نتيجة`;
 
-  matches.slice(0,60).forEach(s => {
+  matches.forEach(s => {
     const num = String(s.num).padStart(3,'0');
     const url = moshaf.server + num + ".mp3";
+    const info = {number: s.num, name: s.name, rid: selectedReciter.id, reciter: selectedReciter.name, moshaf: moshaf.name, url: url};
     const row = document.createElement('div');
     row.className = 'row';
+    row.dataset.info = JSON.stringify(info);
+    const reciterHtml = (info.rid !== undefined && info.rid !== null)
+      ? `<a href="reciter.html?id=${encodeURIComponent(info.rid)}">${esc(info.reciter)}</a>`
+      : esc(info.reciter);
     row.innerHTML = `
       <div class="row-top">
         <div class="info">
-          <a class="surah-name" href="surah.html?number=${s.num}&reciter=${encodeURIComponent(selectedReciter.name)}&moshaf=${encodeURIComponent(moshaf.name)}&url=${encodeURIComponent(url)}">سورة ${s.name}</a>
-          <span class="reciter-name">${selectedReciter.name} — ${moshaf.name}</span>
+          <a class="surah-name" href="${esc(surahLink(info))}">سورة ${esc(s.name)}</a>
+          <span class="reciter-name">${reciterHtml} — ${esc(info.moshaf)}</span>
         </div>
         <div class="btn-group">
-          <button class="listen-btn" data-url="${url}">استماع</button>
+          <button class="listen-btn" data-url="${esc(url)}">استماع</button>
           <a class="dl-btn" href="download.html?url=${encodeURIComponent(url)}&name=${encodeURIComponent('سورة ' + s.name)}&reciter=${encodeURIComponent(selectedReciter.name)}">تحميل</a>
+          <button class="share-btn" aria-label="مشاركة على واتساب"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><path d="M8.6 10.5l6.8-4M8.6 13.5l6.8 4"/></svg></button>
         </div>
       </div>
       <div class="audio-wrap">
@@ -325,6 +384,8 @@ function renderResults(){
 let openRow = null;
 
 resultsEl.addEventListener('click', (e) => {
+  const sb = e.target.closest('.share-btn');
+  if(sb){ shareWA(JSON.parse(sb.closest('.row').dataset.info)); return; }
   const btn = e.target.closest('.listen-btn');
   if(!btn) return;
   const row = btn.closest('.row');
@@ -357,7 +418,21 @@ resultsEl.addEventListener('click', (e) => {
   btn.classList.add('playing');
   audio.play();
   openRow = row;
+  saveLast(Object.assign(JSON.parse(row.dataset.info), {time: audio.currentTime || 0, ts: Date.now()}));
 });
+
+// remember where the listener stopped (throttled)
+let lastTick = 0;
+resultsEl.addEventListener('timeupdate', (e) => {
+  const a = e.target;
+  if(!(a instanceof HTMLAudioElement)) return;
+  const now = Date.now();
+  if(now - lastTick < 5000) return;
+  lastTick = now;
+  const row = a.closest('.row');
+  if(!row || !row.dataset.info) return;
+  saveLast(Object.assign(JSON.parse(row.dataset.info), {time: a.currentTime, ts: now}));
+}, true);
 
 reciterSelect.addEventListener('change', () => {
   const idx = reciterSelect.value;
