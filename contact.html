@@ -15,6 +15,12 @@
     --gold: #c9a24b; --gold-soft: #e4c979; --cream: #f6f1e4;
     --muted: #a9c2bc; --line: rgba(246,241,228,0.12);
   }
+  :root[data-theme="light"]{
+    --bg:#f6f1e4; --bg-2:#fbf8ef; --panel:#ffffff; --gold:#a8822c; --gold-soft:#c9a24b;
+    --cream:#1c2b28; --muted:#5d716c; --line:rgba(28,43,40,0.14);
+  }
+  .theme-btn{background:var(--panel);border:1px solid var(--line);color:var(--muted);font-size:14px;font-weight:700;padding:10px 16px;border-radius:999px;font-family:'Tajawal',sans-serif;cursor:pointer;transition:transform .12s ease;}
+  .theme-btn:active{transform:scale(.94);}
   *{box-sizing:border-box;}
   html,body{margin:0;padding:0;}
   body{
@@ -85,6 +91,7 @@
     <a href="index.html">الرئيسية</a>
     <a href="about.html">من نحن</a>
     <a href="contact.html" class="active">تواصل معنا</a>
+    <button class="theme-btn" id="themeBtn">🌙</button>
   </nav>
   <p class="kicker">تلاوتي</p>
   <h1>تواصل معنا</h1>
@@ -126,6 +133,21 @@ document.getElementById('contactForm').addEventListener('submit', function(e){
   const mailto = `mailto:talawaty998@gmail.com?subject=${encodeURIComponent('تلاوتي - ' + subject)}&body=${encodeURIComponent(msg)}`;
   window.location.href = mailto;
 });
+</script>
+
+<script>
+(function(){
+  const root=document.documentElement, btn=document.getElementById('themeBtn');
+  try{const t=localStorage.getItem('theme'); if(t)root.setAttribute('data-theme',t);}catch(e){}
+  function sync(){btn.textContent=root.getAttribute('data-theme')==='light'?'🌙':'☀️';}
+  sync();
+  btn.addEventListener('click',()=>{
+    const nt=root.getAttribute('data-theme')==='light'?'dark':'light';
+    root.setAttribute('data-theme',nt);
+    try{localStorage.setItem('theme',nt);}catch(e){}
+    sync();
+  });
+})();
 </script>
 </body>
 </html>

@@ -318,7 +318,7 @@ function renderResults(){
         </div>
       </div>
       <div class="audio-wrap">
-        <audio controls preload="none"></audio>
+        <audio controls controlsList="nodownload" oncontextmenu="return false" preload="none"></audio>
       </div>
     `;
     resultsEl.appendChild(row);
