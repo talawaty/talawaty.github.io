@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>سورة — تلاوتي</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='20' fill='%230f2b28'/%3E%3Ctext x='50' y='68' font-size='55' text-anchor='middle'%3E%F0%9F%93%96%3C/text%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Reem+Kufi:wght@400..700&family=Tajawal:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#0f2b28; --bg-2:#123833; --panel:#16403a; --gold:#c9a24b; --gold-soft:#e4c979;
+    --cream:#f6f1e4; --muted:#a9c2bc; --line:rgba(246,241,228,0.12);
+  }
+  :root[data-theme="light"]{
+    --bg:#f6f1e4; --bg-2:#fbf8ef; --panel:#ffffff; --gold:#a8822c; --gold-soft:#c9a24b;
+    --cream:#1c2b28; --muted:#5d716c; --line:rgba(28,43,40,0.14);
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{background:radial-gradient(1200px 600px at 50% -10%,var(--bg-2),var(--bg) 60%);color:var(--cream);font-family:'Tajawal',sans-serif;min-height:100vh;}
+  .wrap{max-width:640px;margin:0 auto;padding:36px 20px 80px;}
+  .topbar{display:flex;justify-content:space-between;align-items:center;margin-bottom:26px;}
+  .topnav{display:flex;gap:8px;}
+  .topnav a,.theme-btn{background:var(--panel);border:1px solid var(--line);color:var(--muted);text-decoration:none;font-size:14px;font-weight:700;padding:10px 16px;border-radius:999px;font-family:'Tajawal',sans-serif;cursor:pointer;transition:transform .12s ease;}
+  .topnav a:active,.theme-btn:active{transform:scale(.94);}
+  .kicker{font-family:'Reem Kufi',sans-serif;color:var(--gold-soft);text-align:center;margin:0 0 8px;}
+  h1{font-family:'Reem Kufi',sans-serif;font-size:clamp(30px,6vw,42px);text-align:center;margin:0 0 6px;}
+  .meta{text-align:center;color:var(--muted);margin-bottom:28px;}
+  .panel{background:var(--panel);border:1px solid var(--line);border-radius:18px;padding:22px;margin-bottom:16px;}
+  .panel h2{font-size:16px;color:var(--gold-soft);margin:0 0 12px;}
+  .reciter{color:var(--muted);font-size:14px;margin-bottom:14px;}
+  audio{width:100%;height:40px;margin-bottom:14px;}
+  .btns{display:flex;gap:10px;}
+  .btn{flex:1;text-align:center;text-decoration:none;font-weight:700;padding:13px;border-radius:12px;font-size:15px;font-family:'Tajawal',sans-serif;}
+  .btn.gold{background:linear-gradient(180deg,var(--gold-soft),var(--gold));color:#1a1207;}
+  .btn.line{border:1px solid var(--gold-soft);color:var(--gold-soft);}
+  .btn:active{transform:scale(.97);}
+  .nav-surah{display:flex;justify-content:space-between;margin-top:8px;}
+  .nav-surah a{color:var(--muted);text-decoration:none;font-size:14px;}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="topbar">
+    <nav class="topnav">
+      <a href="index.html">الرئيسية</a>
+      <a href="about.html">من نحن</a>
+      <a href="contact.html">تواصل معنا</a>
+    </nav>
+    <button class="theme-btn" id="themeBtn">🌙</button>
+  </div>
+
+  <p class="kicker">تلاوتي</p>
+  <h1 id="sName">سورة</h1>
+  <p class="meta" id="sMeta"></p>
+
+  <div class="panel" id="listenPanel">
+    <h2>الاستماع والتحميل</h2>
+    <div class="reciter" id="reciterLine"></div>
+    <audio id="audio" controls preload="none"></audio>
+    <div class="btns">
+      <a class="btn gold" id="dlBtn" href="#">تحميل</a>
+      <a class="btn line" id="tafsirBtn" href="#">التفسير آية بآية</a>
+    </div>
+  </div>
+
+  <div class="nav-surah">
+    <a id="prevLink" href="#"></a>
+    <a id="nextLink" href="#"></a>
+  </div>
+</div>
+
+<script>
+const SURAHS=["الفاتحة","البقرة","آل عمران","النساء","المائدة","الأنعام","الأعراف","الأنفال","التوبة","يونس","هود","يوسف","الرعد","إبراهيم","الحجر","النحل","الإسراء","الكهف","مريم","طه","الأنبياء","الحج","المؤمنون","النور","الفرقان","الشعراء","النمل","القصص","العنكبوت","الروم","لقمان","السجدة","الأحزاب","سبأ","فاطر","يس","الصافات","ص","الزمر","غافر","فصلت","الشورى","الزخرف","الدخان","الجاثية","الأحقاف","محمد","الفتح","الحجرات","ق","الذاريات","الطور","النجم","القمر","الرحمن","الواقعة","الحديد","المجادلة","الحشر","الممتحنة","الصف","الجمعة","المنافقون","التغابن","الطلاق","التحريم","الملك","القلم","الحاقة","المعارج","نوح","الجن","المزمل","المدثر","القيامة","الإنسان","المرسلات","النبأ","النازعات","عبس","التكوير","الانفطار","المطففين","الانشقاق","البروج","الطارق","الأعلى","الغاشية","الفجر","البلد","الشمس","الليل","الضحى","الشرح","التين","العلق","القدر","البينة","الزلزلة","العاديات","القارعة","التكاثر","العصر","الهمزة","الفيل","قريش","الماعون","الكوثر","الكافرون","النصر","المسد","الإخلاص","الفلق","الناس"];
+const AYAHS=[7,286,200,176,120,165,206,75,129,109,123,111,43,52,99,128,111,110,98,135,112,78,118,64,77,227,93,88,69,60,34,30,73,54,45,83,182,88,75,85,54,53,89,59,37,35,38,29,18,45,60,49,62,55,78,96,29,22,24,13,14,11,11,18,12,12,30,52,52,44,28,28,20,56,40,31,50,40,46,42,29,19,36,25,22,17,19,26,30,20,15,21,11,8,8,19,5,8,8,11,11,8,3,9,5,4,7,3,6,3,5,4,5,6];
+
+const p=new URLSearchParams(location.search);
+const n=Math.min(114,Math.max(1,parseInt(p.get('number'),10)||1));
+const name=SURAHS[n-1];
+const reciter=p.get('reciter')||'';
+const moshaf=p.get('moshaf')||'';
+const url=p.get('url')||'';
+
+document.title='سورة '+name+' — تلاوتي';
+document.getElementById('sName').textContent='سورة '+name;
+document.getElementById('sMeta').textContent='رقمها '+n+' في المصحف • عدد آياتها '+AYAHS[n-1];
+
+const tafsirLink='tafsir.html?number='+n;
+document.getElementById('tafsirBtn').href=tafsirLink;
+
+if(url){
+  document.getElementById('reciterLine').textContent=reciter+(moshaf?' — '+moshaf:'');
+  document.getElementById('audio').src=url;
+  document.getElementById('dlBtn').href='download.html?url='+encodeURIComponent(url)+'&name='+encodeURIComponent('سورة '+name)+'&reciter='+encodeURIComponent(reciter);
+}else{
+  document.getElementById('listenPanel').querySelector('audio').style.display='none';
+  document.getElementById('reciterLine').textContent='اختر قارئًا من الصفحة الرئيسية للاستماع والتحميل.';
+  document.getElementById('dlBtn').href='index.html';
+  document.getElementById('dlBtn').textContent='اختر قارئًا';
+}
+
+const prev=document.getElementById('prevLink'), next=document.getElementById('nextLink');
+if(n>1){prev.href='surah.html?number='+(n-1); prev.textContent='→ سورة '+SURAHS[n-2];}
+if(n<114){next.href='surah.html?number='+(n+1); next.textContent='سورة '+SURAHS[n]+' ←';}
+
+const root=document.documentElement, btn=document.getElementById('themeBtn');
+try{const t=localStorage.getItem('theme'); if(t)root.setAttribute('data-theme',t);}catch(e){}
+function syncBtn(){btn.textContent=root.getAttribute('data-theme')==='light'?'🌙':'☀️';}
+syncBtn();
+btn.addEventListener('click',()=>{
+  const nt=root.getAttribute('data-theme')==='light'?'dark':'light';
+  root.setAttribute('data-theme',nt);
+  try{localStorage.setItem('theme',nt);}catch(e){}
+  syncBtn();
+});
+</script>
+</body>
+</html>

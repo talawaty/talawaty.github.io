@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>التفسير — تلاوتي</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='20' fill='%230f2b28'/%3E%3Ctext x='50' y='68' font-size='55' text-anchor='middle'%3E%F0%9F%93%96%3C/text%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&family=Reem+Kufi:wght@400..700&family=Tajawal:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#0f2b28; --bg-2:#123833; --panel:#16403a; --gold:#c9a24b; --gold-soft:#e4c979;
+    --cream:#f6f1e4; --muted:#a9c2bc; --line:rgba(246,241,228,0.12);
+  }
+  :root[data-theme="light"]{
+    --bg:#f6f1e4; --bg-2:#fbf8ef; --panel:#ffffff; --gold:#a8822c; --gold-soft:#c9a24b;
+    --cream:#1c2b28; --muted:#5d716c; --line:rgba(28,43,40,0.14);
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{background:radial-gradient(1200px 600px at 50% -10%,var(--bg-2),var(--bg) 60%);color:var(--cream);font-family:'Tajawal',sans-serif;min-height:100vh;}
+  .wrap{max-width:680px;margin:0 auto;padding:36px 20px 80px;}
+  .topbar{display:flex;justify-content:space-between;align-items:center;margin-bottom:26px;}
+  .topnav{display:flex;gap:8px;}
+  .topnav a,.theme-btn{background:var(--panel);border:1px solid var(--line);color:var(--muted);text-decoration:none;font-size:14px;font-weight:700;padding:10px 16px;border-radius:999px;font-family:'Tajawal',sans-serif;cursor:pointer;transition:transform .12s ease;}
+  .topnav a:active,.theme-btn:active{transform:scale(.94);}
+  .kicker{font-family:'Reem Kufi',sans-serif;color:var(--gold-soft);text-align:center;margin:0 0 8px;}
+  h1{font-family:'Reem Kufi',sans-serif;font-size:clamp(26px,5vw,36px);text-align:center;margin:0 0 6px;}
+  .meta{text-align:center;color:var(--muted);margin:0 0 24px;font-size:14px;}
+  .src{text-align:center;color:var(--muted);font-size:12px;margin-bottom:24px;}
+  .status{text-align:center;color:var(--muted);padding:30px 0;}
+  .ayah{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:18px 18px 16px;margin-bottom:12px;}
+  .ayah-head{display:flex;align-items:center;gap:10px;margin-bottom:10px;}
+  .num{flex-shrink:0;width:34px;height:34px;border-radius:50%;background:linear-gradient(180deg,var(--gold-soft),var(--gold));color:#1a1207;font-weight:700;font-size:14px;display:flex;align-items:center;justify-content:center;}
+  .ayah-text{font-family:'Amiri',serif;font-size:22px;line-height:2;color:var(--cream);}
+  .tafsir{border-top:1px dashed var(--line);margin-top:12px;padding-top:12px;color:var(--muted);line-height:1.95;font-size:15px;}
+  .tafsir b{display:block;color:var(--gold-soft);font-size:13px;margin-bottom:4px;}
+  .back{display:block;text-align:center;margin-top:20px;color:var(--gold-soft);text-decoration:none;font-size:14px;}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="topbar">
+    <nav class="topnav">
+      <a href="index.html">الرئيسية</a>
+      <a href="about.html">من نحن</a>
+      <a href="contact.html">تواصل معنا</a>
+    </nav>
+    <button class="theme-btn" id="themeBtn">🌙</button>
+  </div>
+
+  <p class="kicker">التفسير الميسّر</p>
+  <h1 id="title">سورة</h1>
+  <p class="meta" id="meta"></p>
+  <p class="src">التفسير من «التفسير الميسّر»، عبر واجهة alquran.cloud</p>
+
+  <div id="status" class="status">جارِ تحميل التفسير…</div>
+  <div id="list"></div>
+
+  <a class="back" id="backLink" href="index.html">← رجوع لصفحة السورة</a>
+</div>
+
+<script>
+const SURAHS=["الفاتحة","البقرة","آل عمران","النساء","المائدة","الأنعام","الأعراف","الأنفال","التوبة","يونس","هود","يوسف","الرعد","إبراهيم","الحجر","النحل","الإسراء","الكهف","مريم","طه","الأنبياء","الحج","المؤمنون","النور","الفرقان","الشعراء","النمل","القصص","العنكبوت","الروم","لقمان","السجدة","الأحزاب","سبأ","فاطر","يس","الصافات","ص","الزمر","غافر","فصلت","الشورى","الزخرف","الدخان","الجاثية","الأحقاف","محمد","الفتح","الحجرات","ق","الذاريات","الطور","النجم","القمر","الرحمن","الواقعة","الحديد","المجادلة","الحشر","الممتحنة","الصف","الجمعة","المنافقون","التغابن","الطلاق","التحريم","الملك","القلم","الحاقة","المعارج","نوح","الجن","المزمل","المدثر","القيامة","الإنسان","المرسلات","النبأ","النازعات","عبس","التكوير","الانفطار","المطففين","الانشقاق","البروج","الطارق","الأعلى","الغاشية","الفجر","البلد","الشمس","الليل","الضحى","الشرح","التين","العلق","القدر","البينة","الزلزلة","العاديات","القارعة","التكاثر","العصر","الهمزة","الفيل","قريش","الماعون","الكوثر","الكافرون","النصر","المسد","الإخلاص","الفلق","الناس"];
+
+const n=Math.min(114,Math.max(1,parseInt(new URLSearchParams(location.search).get('number'),10)||1));
+const name=SURAHS[n-1];
+document.title='تفسير سورة '+name+' — تلاوتي';
+document.getElementById('title').textContent='تفسير سورة '+name;
+document.getElementById('backLink').href='surah.html?number='+n;
+
+const statusEl=document.getElementById('status'), listEl=document.getElementById('list');
+
+async function load(){
+  try{
+    const [txt, taf] = await Promise.all([
+      fetch('https://api.alquran.cloud/v1/surah/'+n+'/quran-uthmani').then(r=>r.json()),
+      fetch('https://api.alquran.cloud/v1/surah/'+n+'/ar.muyassar').then(r=>r.json())
+    ]);
+    const a=txt.data.ayahs, t=taf.data.ayahs;
+    document.getElementById('meta').textContent='عدد الآيات: '+a.length;
+    statusEl.style.display='none';
+    a.forEach((ay,i)=>{
+      const d=document.createElement('div');
+      d.className='ayah';
+      d.innerHTML='<div class="ayah-head"><div class="num">'+ay.numberInSurah+'</div></div>'+
+        '<div class="ayah-text"></div><div class="tafsir"><b>التفسير</b><span></span></div>';
+      d.querySelector('.ayah-text').textContent=ay.text;
+      d.querySelector('.tafsir span').textContent=(t[i]&&t[i].text)||'';
+      listEl.appendChild(d);
+    });
+  }catch(e){
+    statusEl.textContent='تعذّر تحميل التفسير الآن. تحقق من الاتصال بالإنترنت وحاول مرة أخرى.';
+  }
+}
+load();
+
+const root=document.documentElement, btn=document.getElementById('themeBtn');
+try{const t=localStorage.getItem('theme'); if(t)root.setAttribute('data-theme',t);}catch(e){}
+function syncBtn(){btn.textContent=root.getAttribute('data-theme')==='light'?'🌙':'☀️';}
+syncBtn();
+btn.addEventListener('click',()=>{
+  const nt=root.getAttribute('data-theme')==='light'?'dark':'light';
+  root.setAttribute('data-theme',nt);
+  try{localStorage.setItem('theme',nt);}catch(e){}
+  syncBtn();
+});
+</script>
+</body>
+</html>
