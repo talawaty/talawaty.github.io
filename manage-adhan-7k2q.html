@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex, nofollow">
+<title>إدارة الأذان</title>
+<link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  :root{--bg:#0f2b28;--panel:#16403a;--gold:#c9a24b;--gold-soft:#e4c979;--cream:#f6f1e4;--muted:#a9c2bc;--line:rgba(246,241,228,0.15);--red:#e0685a;}
+  *{box-sizing:border-box;}
+  body{margin:0;background:var(--bg);color:var(--cream);font-family:'Tajawal',sans-serif;padding:24px 16px 60px;}
+  .wrap{max-width:560px;margin:0 auto;}
+  h1{font-size:20px;margin:0 0 4px;}
+  .note{color:var(--muted);font-size:13px;line-height:1.8;margin-bottom:22px;}
+  .panel{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:20px;margin-bottom:18px;}
+  label{display:block;font-size:13px;color:var(--gold-soft);margin-bottom:6px;}
+  input[type=text],input[type=password],textarea{width:100%;background:var(--bg);border:1px solid var(--line);color:var(--cream);padding:12px;border-radius:10px;font-family:'Tajawal',sans-serif;font-size:15px;margin-bottom:14px;}
+  textarea{min-height:70px;resize:vertical;}
+  input[type=file]{width:100%;margin-bottom:14px;color:var(--muted);font-size:14px;}
+  button{width:100%;background:linear-gradient(180deg,var(--gold-soft),var(--gold));color:#1a1207;border:none;font-weight:700;font-size:15px;padding:13px;border-radius:12px;cursor:pointer;font-family:'Tajawal',sans-serif;}
+  button:disabled{opacity:0.5;}
+  .status{margin-top:14px;font-size:14px;line-height:1.8;white-space:pre-wrap;}
+  .status.ok{color:#8fd19e;}
+  .status.err{color:var(--red);}
+  .list-item{display:flex;justify-content:space-between;align-items:center;background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:10px 14px;margin-bottom:8px;font-size:14px;}
+  .del{background:transparent;color:var(--red);border:1px solid var(--red);width:auto;padding:6px 12px;font-size:12px;border-radius:8px;}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>إدارة صفحة الأذان</h1>
+  <p class="note">هذه الصفحة سرية وغير مرتبطة بأي مكان ظاهر في الموقع. أي شخص معه الرابط ومعه مفتاحك يقدر يستخدمها، فاحتفظ بالرابط لنفسك.</p>
+
+  <div class="panel">
+    <label>مفتاح GitHub (Token) — يُحفظ في متصفحك فقط</label>
+    <input type="password" id="token" placeholder="ghp_xxxxxxxxxxxx">
+    <p class="note" style="margin:0;">
+      لو معملتش واحد قبل كده: روح على
+      github.com/settings/personal-access-tokens/new
+      → اختر "Fine-grained token" → في "Repository access" اختر
+      "Only select repositories" وحدد talawaty.github.io فقط →
+      في "Permissions" فعّل "Contents: Read and write" → أنشئ التوكن،
+      وانسخه والصقه هنا (هيتحفظ في المتصفح بس ومش هيروح لحد غيري ولا غيرك).
+    </p>
+  </div>
+
+  <div class="panel">
+    <label>اسم المؤذن</label>
+    <input type="text" id="name" placeholder="مثال: علي أحمد ملا">
+    <label>نبذة عنه (اختياري)</label>
+    <textarea id="bio" placeholder="مؤذن المسجد الحرام، يُلقّب بـ..."></textarea>
+    <label>ملف الأذان (MP3)</label>
+    <input type="file" id="file" accept="audio/mpeg,audio/mp3,.mp3">
+    <button id="submitBtn">رفع وإضافة</button>
+    <div id="status" class="status"></div>
+  </div>
+
+  <div class="panel">
+    <label>المؤذنون المضافون حاليًا</label>
+    <div id="list">جارِ التحميل…</div>
+  </div>
+</div>
+
+<script>
+const OWNER='talawaty', REPO='talawaty.github.io', BRANCH='main';
+const API='https://api.github.com/repos/'+OWNER+'/'+REPO+'/contents/';
+const tokenEl=document.getElementById('token');
+try{ tokenEl.value = localStorage.getItem('gh_token') || ''; }catch(e){}
+tokenEl.addEventListener('input', ()=>{ try{ localStorage.setItem('gh_token', tokenEl.value); }catch(e){} });
+
+function headers(){
+  return { 'Authorization':'Bearer '+tokenEl.value.trim(), 'Accept':'application/vnd.github+json' };
+}
+function setStatus(msg, cls){
+  const s=document.getElementById('status');
+  s.textContent=msg; s.className='status '+(cls||'');
+}
+function fileToBase64(file){
+  return new Promise((resolve,reject)=>{
+    const r=new FileReader();
+    r.onload=()=>resolve(r.result.split(',')[1]);
+    r.onerror=reject;
+    r.readAsDataURL(file);
+  });
+}
+async function getJsonFile(){
+  const res=await fetch(API+'adhan-data.json?ref='+BRANCH, {headers: headers()});
+  if(res.status===404) return {sha:null, data:[]};
+  if(!res.ok) throw new Error('تعذّر قراءة ملف البيانات ('+res.status+')');
+  const j=await res.json();
+  const data=JSON.parse(decodeURIComponent(escape(atob(j.content.replace(/\n/g,'')))));
+  return {sha:j.sha, data};
+}
+async function putFile(path, base64content, message, sha){
+  const body={ message, content: base64content, branch: BRANCH };
+  if(sha) body.sha=sha;
+  const res=await fetch(API+encodeURI(path), { method:'PUT', headers: Object.assign({'Content-Type':'application/json'}, headers()), body: JSON.stringify(body) });
+  if(!res.ok){ const t=await res.text(); throw new Error('فشل الرفع ('+res.status+'): '+t.slice(0,200)); }
+  return res.json();
+}
+async function deleteFile(path, sha, message){
+  const res=await fetch(API+encodeURI(path), { method:'DELETE', headers: Object.assign({'Content-Type':'application/json'}, headers()), body: JSON.stringify({message, sha, branch: BRANCH}) });
+  if(!res.ok){ const t=await res.text(); throw new Error('فشل الحذف: '+t.slice(0,200)); }
+}
+
+async function refreshList(){
+  const listEl=document.getElementById('list');
+  try{
+    const {data}=await getJsonFile();
+    if(!data.length){ listEl.textContent='لا يوجد مؤذنون مضافون بعد.'; return; }
+    listEl.innerHTML='';
+    data.forEach(m=>{
+      const row=document.createElement('div'); row.className='list-item';
+      row.innerHTML='<span>'+m.name.replace(/[<>&]/g,c=>({'<':'&lt;','>':'&gt;','&':'&amp;'}[c]))+'</span>';
+      const btn=document.createElement('button'); btn.className='del'; btn.textContent='حذف';
+      btn.addEventListener('click', ()=>removeMuezzin(m));
+      row.appendChild(btn);
+      listEl.appendChild(row);
+    });
+  }catch(e){ listEl.textContent='تعذّر تحميل القائمة: '+e.message; }
+}
+
+async function removeMuezzin(m){
+  if(!confirm('تأكيد حذف '+m.name+'؟')) return;
+  try{
+    setStatus('جارِ الحذف…');
+    const {sha, data}=await getJsonFile();
+    const next=data.filter(x=>x.slug!==m.slug);
+    await putFile('adhan-data.json', btoa(unescape(encodeURIComponent(JSON.stringify(next,null,2)))), 'حذف مؤذن: '+m.name, sha);
+    try{
+      const fres=await fetch(API+encodeURI(m.file), {headers: headers()});
+      if(fres.ok){ const fj=await fres.json(); await deleteFile(m.file, fj.sha, 'حذف ملف أذان: '+m.name); }
+    }catch(e){}
+    setStatus('تم الحذف.', 'ok');
+    refreshList();
+  }catch(e){ setStatus('خطأ: '+e.message, 'err'); }
+}
+
+document.getElementById('submitBtn').addEventListener('click', async ()=>{
+  const name=document.getElementById('name').value.trim();
+  const bio=document.getElementById('bio').value.trim();
+  const fileInput=document.getElementById('file');
+  const btn=document.getElementById('submitBtn');
+  if(!tokenEl.value.trim()){ setStatus('محتاج تحط مفتاح GitHub الأول.', 'err'); return; }
+  if(!name){ setStatus('اكتب اسم المؤذن.', 'err'); return; }
+  if(!fileInput.files.length){ setStatus('اختر ملف MP3.', 'err'); return; }
+  const file=fileInput.files[0];
+  btn.disabled=true;
+  try{
+    setStatus('جارِ رفع ملف الصوت… ('+(file.size/1024/1024).toFixed(1)+' MB)');
+    const slug='adhan-'+Date.now();
+    const path='audio/adhan/'+slug+'.mp3';
+    const base64=await fileToBase64(file);
+    await putFile(path, base64, 'إضافة أذان: '+name);
+
+    setStatus('جارِ تحديث القائمة…');
+    const {sha, data}=await getJsonFile();
+    data.push({slug, name, bio, file: path});
+    await putFile('adhan-data.json', btoa(unescape(encodeURIComponent(JSON.stringify(data,null,2)))), 'إضافة مؤذن للقائمة: '+name, sha);
+
+    setStatus('تم بنجاح! هيظهر على الموقع خلال دقيقة أو اتنين.\nرابط الصفحة: adhan.html?slug='+slug, 'ok');
+    document.getElementById('name').value='';
+    document.getElementById('bio').value='';
+    fileInput.value='';
+    refreshList();
+  }catch(e){
+    setStatus('خطأ: '+e.message, 'err');
+  }finally{
+    btn.disabled=false;
+  }
+});
+
+refreshList();
+</script>
+</body>
+</html>

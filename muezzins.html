@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>المؤذنون — تلاوتي</title>
+<meta name="description" content="استمع أو حمّل الأذان بصوت مجموعة من كبار المؤذنين.">
+<link rel="icon" type="image/png" sizes="192x192" href="favicon.png">
+<link rel="apple-touch-icon" href="favicon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Reem+Kufi:wght@400..700&family=Tajawal:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  :root{--bg:#0f2b28;--bg-2:#123833;--panel:#16403a;--gold:#c9a24b;--gold-soft:#e4c979;--cream:#f6f1e4;--muted:#a9c2bc;--line:rgba(246,241,228,0.12);}
+  :root[data-theme="light"]{--bg:#f6f1e4;--bg-2:#fbf8ef;--panel:#ffffff;--gold:#a8822c;--gold-soft:#c9a24b;--cream:#1c2b28;--muted:#5d716c;--line:rgba(28,43,40,0.14);}
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{background:radial-gradient(1200px 600px at 50% -10%,var(--bg-2),var(--bg) 60%);color:var(--cream);font-family:'Tajawal',sans-serif;min-height:100vh;}
+  .wrap{max-width:700px;margin:0 auto;padding:36px 20px 80px;}
+  .topnav{display:flex;justify-content:center;gap:8px;margin-bottom:28px;flex-wrap:wrap;}
+  .topnav a,.theme-btn{background:var(--panel);border:1px solid var(--line);color:var(--muted);text-decoration:none;font-size:14px;font-weight:700;padding:10px 18px;border-radius:999px;font-family:'Tajawal',sans-serif;cursor:pointer;transition:transform .12s ease;}
+  .topnav a:active,.theme-btn:active{transform:scale(.94);}
+  .topnav a.active{background:linear-gradient(180deg,var(--gold-soft),var(--gold));color:#1a1207;border-color:transparent;}
+  .kicker{font-family:'Reem Kufi',sans-serif;color:var(--gold-soft);text-align:center;margin:0 0 8px;}
+  h1{font-family:'Reem Kufi',sans-serif;font-size:clamp(26px,5vw,36px);text-align:center;margin:0 0 8px;}
+  .sub{text-align:center;color:var(--muted);margin:0 0 26px;font-size:14px;}
+  .status{text-align:center;color:var(--muted);padding:26px 0;font-size:15px;}
+  .list{display:flex;flex-direction:column;gap:10px;}
+  .m-item{display:flex;align-items:center;justify-content:space-between;gap:10px;background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:16px 18px;color:var(--cream);text-decoration:none;}
+  .m-item:active{transform:scale(.98);}
+  .m-name{font-weight:700;font-size:16px;}
+  .m-arrow{color:var(--gold-soft);font-size:18px;}
+
+  .soon-wrap{display:flex;flex-direction:column;align-items:center;gap:18px;padding:50px 0;}
+  .soon-text{
+    font-family:'Reem Kufi',sans-serif;
+    font-size:clamp(30px,8vw,46px);
+    color:var(--gold-soft);
+    background:linear-gradient(90deg,var(--gold),var(--gold-soft),var(--cream),var(--gold-soft),var(--gold));
+    background-size:300% 100%;
+    -webkit-background-clip:text;
+    background-clip:text;
+    -webkit-text-fill-color:transparent;
+    animation:shine 3s linear infinite, pulse 2.2s ease-in-out infinite;
+  }
+  @keyframes shine{0%{background-position:0% 50%;}100%{background-position:300% 50%;}}
+  @keyframes pulse{0%,100%{transform:scale(1);}50%{transform:scale(1.06);}}
+  .soon-sub{color:var(--muted);font-size:14px;text-align:center;max-width:320px;}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <nav class="topnav">
+    <a href="index.html">الرئيسية</a>
+    <a href="muezzins.html" class="active">المؤذنين</a>
+    <a href="about.html">من نحن</a>
+    <a href="contact.html">تواصل معنا</a>
+    <button class="theme-btn" id="themeBtn">🌙</button>
+  </nav>
+
+  <p class="kicker">الأذان</p>
+  <h1>المؤذنون</h1>
+  <p class="sub">استمع أو حمّل الأذان بصوت نخبة من المؤذنين</p>
+
+  <div id="status" class="status" style="display:none;"></div>
+  <div class="list" id="list"></div>
+</div>
+
+<script>
+fetch('adhan-data.json?_=' + Date.now())
+  .then(r => r.json())
+  .then(data => {
+    const list = document.getElementById('list');
+    if (!data.length) {
+      list.innerHTML = '<div class="soon-wrap"><div class="soon-text">قريبًا…</div>' +
+        '<p class="soon-sub">جارِ إضافة الأذان بأصوات نخبة من المؤذنين، تابعونا.</p></div>';
+      return;
+    }
+    list.innerHTML = data.map(m =>
+      '<a class="m-item" href="adhan.html?slug=' + encodeURIComponent(m.slug) + '">' +
+      '<span class="m-name">' + m.name.replace(/[<>&]/g,c=>({'<':'&lt;','>':'&gt;','&':'&amp;'}[c])) + '</span>' +
+      '<span class="m-arrow">←</span></a>'
+    ).join('');
+  })
+  .catch(() => {
+    document.getElementById('list').innerHTML = '<div class="soon-wrap"><div class="soon-text">قريبًا…</div>' +
+      '<p class="soon-sub">جارِ إضافة الأذان بأصوات نخبة من المؤذنين، تابعونا.</p></div>';
+  });
+
+(function(){
+  const root=document.documentElement, btn=document.getElementById('themeBtn');
+  try{const t=localStorage.getItem('theme'); if(t)root.setAttribute('data-theme',t);}catch(e){}
+  const sync=()=>{btn.textContent=root.getAttribute('data-theme')==='light'?'🌙':'☀️';}; sync();
+  btn.addEventListener('click',()=>{const nt=root.getAttribute('data-theme')==='light'?'dark':'light';root.setAttribute('data-theme',nt);try{localStorage.setItem('theme',nt);}catch(e){}sync();});
+})();
+</script>
+</body>
+</html>

@@ -1,4 +1,5 @@
 User-agent: *
 Allow: /
+Disallow: /manage-adhan-7k2q.html
 
 Sitemap: https://talawaty.github.io/sitemap.xml

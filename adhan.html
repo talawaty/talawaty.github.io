@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>الأذان — تلاوتي</title>
+<link rel="icon" type="image/png" sizes="192x192" href="favicon.png">
+<link rel="apple-touch-icon" href="favicon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Reem+Kufi:wght@400..700&family=Tajawal:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  :root{--bg:#0f2b28;--bg-2:#123833;--panel:#16403a;--gold:#c9a24b;--gold-soft:#e4c979;--cream:#f6f1e4;--muted:#a9c2bc;--line:rgba(246,241,228,0.12);}
+  :root[data-theme="light"]{--bg:#f6f1e4;--bg-2:#fbf8ef;--panel:#ffffff;--gold:#a8822c;--gold-soft:#c9a24b;--cream:#1c2b28;--muted:#5d716c;--line:rgba(28,43,40,0.14);}
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{background:radial-gradient(1200px 600px at 50% -10%,var(--bg-2),var(--bg) 60%);color:var(--cream);font-family:'Tajawal',sans-serif;min-height:100vh;}
+  .wrap{max-width:640px;margin:0 auto;padding:36px 20px 80px;}
+  .topbar{display:flex;justify-content:space-between;align-items:center;margin-bottom:26px;}
+  .topnav{display:flex;gap:8px;flex-wrap:wrap;}
+  .topnav a,.theme-btn{background:var(--panel);border:1px solid var(--line);color:var(--muted);text-decoration:none;font-size:14px;font-weight:700;padding:10px 16px;border-radius:999px;font-family:'Tajawal',sans-serif;cursor:pointer;transition:transform .12s ease;}
+  .topnav a:active,.theme-btn:active{transform:scale(.94);}
+  .kicker{font-family:'Reem Kufi',sans-serif;color:var(--gold-soft);text-align:center;margin:0 0 8px;}
+  h1{font-family:'Reem Kufi',sans-serif;font-size:clamp(28px,6vw,40px);text-align:center;margin:0 0 20px;}
+  .status{text-align:center;color:var(--muted);padding:30px 0;}
+  .panel{background:var(--panel);border:1px solid var(--line);border-radius:18px;padding:24px;margin-bottom:16px;}
+  .bio{color:var(--muted);line-height:1.9;font-size:15px;margin:0 0 18px;}
+  audio{width:100%;height:40px;margin-bottom:16px;}
+  .btns{display:flex;gap:10px;}
+  .btn{flex:1;text-align:center;text-decoration:none;font-weight:700;padding:13px;border-radius:12px;font-size:15px;font-family:'Tajawal',sans-serif;border:none;cursor:pointer;}
+  .btn.gold{background:linear-gradient(180deg,var(--gold-soft),var(--gold));color:#1a1207;}
+  .back{display:block;text-align:center;margin-top:20px;color:var(--gold-soft);text-decoration:none;font-size:14px;}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="topbar">
+    <nav class="topnav">
+      <a href="index.html">الرئيسية</a>
+      <a href="muezzins.html">المؤذنين</a>
+      <a href="contact.html">تواصل معنا</a>
+    </nav>
+    <button class="theme-btn" id="themeBtn">🌙</button>
+  </div>
+
+  <h1 id="title">الأذان</h1>
+  <div id="status" class="status">جارِ التحميل…</div>
+
+  <div class="panel" id="panel" style="display:none;">
+    <p class="bio" id="bio"></p>
+    <audio id="audio" controls controlsList="nodownload" oncontextmenu="return false" preload="none"></audio>
+    <div class="btns">
+      <a class="btn gold" id="dlBtn" href="#">تحميل</a>
+    </div>
+  </div>
+
+  <a class="back" href="muezzins.html">← رجوع لقائمة المؤذنين</a>
+</div>
+
+<script>
+const slug = new URLSearchParams(location.search).get('slug');
+fetch('adhan-data.json?_=' + Date.now())
+  .then(r => r.json())
+  .then(data => {
+    const m = data.find(x => x.slug === slug);
+    const status = document.getElementById('status');
+    if (!m) { status.textContent = 'لم يتم العثور على هذا المؤذن.'; return; }
+    document.title = 'أذان ' + m.name + ' — تلاوتي';
+    document.getElementById('title').textContent = m.name;
+    document.getElementById('bio').textContent = m.bio || '';
+    document.getElementById('audio').src = m.file;
+    document.getElementById('dlBtn').href = 'download.html?url=' + encodeURIComponent(m.file) + '&name=' + encodeURIComponent('أذان ' + m.name) + '&reciter=' + encodeURIComponent(m.name);
+    status.style.display = 'none';
+    document.getElementById('panel').style.display = 'block';
+  })
+  .catch(() => { document.getElementById('status').textContent = 'تعذّر تحميل بيانات المؤذن.'; });
+
+(function(){
+  const root=document.documentElement, btn=document.getElementById('themeBtn');
+  try{const t=localStorage.getItem('theme'); if(t)root.setAttribute('data-theme',t);}catch(e){}
+  const sync=()=>{btn.textContent=root.getAttribute('data-theme')==='light'?'🌙':'☀️';}; sync();
+  btn.addEventListener('click',()=>{const nt=root.getAttribute('data-theme')==='light'?'dark':'light';root.setAttribute('data-theme',nt);try{localStorage.setItem('theme',nt);}catch(e){}sync();});
+})();
+</script>
+</body>
+</html>
