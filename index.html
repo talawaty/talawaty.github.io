@@ -44,10 +44,8 @@
     font-family: 'Tajawal', sans-serif;
     min-height:100vh;
   }
-  .topnav{
-    display:flex; justify-content:center; gap: 8px;
-    margin-bottom: 28px;
-  }
+  .topbar{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:28px;}
+  .topnav{flex:1;display:flex;flex-wrap:wrap;justify-content:center;gap:8px;}
   .topnav a{
     background: var(--panel);
     border: 1px solid var(--line);
@@ -223,13 +221,15 @@
 </head>
 <body>
 <div class="wrap">
-  <nav class="topnav">
+  <div class="topbar">
+    <nav class="topnav">
     <a href="index.html" class="active">الرئيسية</a>
     <a href="about.html">من نحن</a>
     <a href="muezzins.html">المؤذنين</a>
     <a href="contact.html">تواصل معنا</a>
+    </nav>
     <button class="theme-btn" id="themeBtn">🌙</button>
-  </nav>
+  </div>
   <header>
     <p class="kicker">القرآن الكريم</p>
     <h1>ابحث عن سورتك، واختر قارئك، ونزّلها مباشرة</h1>
