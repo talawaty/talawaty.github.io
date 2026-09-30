@@ -28,8 +28,7 @@
     background: radial-gradient(1200px 600px at 50% -10%, var(--bg-2), var(--bg) 60%);
     color: var(--cream); font-family: 'Tajawal', sans-serif; min-height:100vh;
   }
-  .topbar{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:28px;}
-  .topnav{flex:1;display:flex;flex-wrap:wrap;justify-content:center;gap:8px;}
+  .topnav{display:flex;flex-wrap:wrap;justify-content:center;align-items:center;gap:8px;margin-bottom:28px;}
   .topnav a{
     background: var(--panel);
     border: 1px solid var(--line);
@@ -86,15 +85,13 @@
 </head>
 <body>
 <div class="wrap">
-  <div class="topbar">
-    <nav class="topnav">
+  <nav class="topnav">
     <a href="index.html">الرئيسية</a>
     <a href="about.html">من نحن</a>
     <a href="muezzins.html">المؤذنين</a>
     <a href="contact.html" class="active">تواصل معنا</a>
-    </nav>
     <button class="theme-btn" id="themeBtn">🌙</button>
-  </div>
+  </nav>
   <p class="kicker">تلاوتي</p>
   <h1>تواصل معنا</h1>
   <p class="intro">لو لقيت رابط تحميل معطّل، أو مشكلة في الموقع، أو عندك اقتراح، ابعتلنا وهنرد عليك في أقرب وقت بإذن الله.</p>
@@ -122,6 +119,7 @@
     </form>
 
     <p class="email-line">أو راسلنا مباشرة على: <a href="mailto:talawaty998@gmail.com">talawaty998@gmail.com</a></p>
+    <p class="email-line" style="margin-top:8px;">أو تابعنا على <a href="https://whatsapp.com/channel/0029Vb6Z3DKGZNCxQMUfPa0z" target="_blank" rel="noopener">قناة واتساب</a></p>
   </div>
 
   <a class="back-link" href="index.html">رجوع للصفحة الرئيسية</a>

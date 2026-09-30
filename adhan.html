@@ -16,8 +16,7 @@
   html,body{margin:0;padding:0;}
   body{background:radial-gradient(1200px 600px at 50% -10%,var(--bg-2),var(--bg) 60%);color:var(--cream);font-family:'Tajawal',sans-serif;min-height:100vh;}
   .wrap{max-width:640px;margin:0 auto;padding:36px 20px 80px;}
-  .topbar{display:flex;justify-content:space-between;align-items:center;margin-bottom:26px;}
-  .topnav{display:flex;gap:8px;flex-wrap:wrap;}
+  .topnav{display:flex;flex-wrap:wrap;justify-content:center;align-items:center;gap:8px;margin-bottom:26px;}
   .topnav a,.theme-btn{background:var(--panel);border:1px solid var(--line);color:var(--muted);text-decoration:none;font-size:14px;font-weight:700;padding:10px 16px;border-radius:999px;font-family:'Tajawal',sans-serif;cursor:pointer;transition:transform .12s ease;}
   .topnav a:active,.theme-btn:active{transform:scale(.94);}
   .kicker{font-family:'Reem Kufi',sans-serif;color:var(--gold-soft);text-align:center;margin:0 0 8px;}
@@ -34,14 +33,12 @@
 </head>
 <body>
 <div class="wrap">
-  <div class="topbar">
-    <nav class="topnav">
+  <nav class="topnav">
       <a href="index.html">الرئيسية</a>
       <a href="muezzins.html">المؤذنين</a>
       <a href="contact.html">تواصل معنا</a>
+      <button class="theme-btn" id="themeBtn">🌙</button>
     </nav>
-    <button class="theme-btn" id="themeBtn">🌙</button>
-  </div>
 
   <h1 id="title">الأذان</h1>
   <div id="status" class="status">جارِ التحميل…</div>

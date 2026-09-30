@@ -17,8 +17,7 @@
   html,body{margin:0;padding:0;}
   body{background:radial-gradient(1200px 600px at 50% -10%,var(--bg-2),var(--bg) 60%);color:var(--cream);font-family:'Tajawal',sans-serif;min-height:100vh;}
   .wrap{max-width:700px;margin:0 auto;padding:36px 20px 80px;}
-  .topbar{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:26px;}
-  .topnav{flex:1;display:flex;justify-content:center;gap:8px;margin-bottom:28px;flex-wrap:wrap;}
+  .topnav{display:flex;flex-wrap:wrap;justify-content:center;align-items:center;gap:8px;margin-bottom:28px;}
   .topnav a,.theme-btn{background:var(--panel);border:1px solid var(--line);color:var(--muted);text-decoration:none;font-size:14px;font-weight:700;padding:10px 18px;border-radius:999px;font-family:'Tajawal',sans-serif;cursor:pointer;transition:transform .12s ease;}
   .topnav a:active,.theme-btn:active{transform:scale(.94);}
   .topnav a.active{background:linear-gradient(180deg,var(--gold-soft),var(--gold));color:#1a1207;border-color:transparent;}
@@ -51,35 +50,22 @@
 </head>
 <body>
 <div class="wrap">
-  <div class="topbar">
-    <nav class="topnav">
+  <nav class="topnav">
     <a href="index.html">الرئيسية</a>
     <a href="muezzins.html" class="active">المؤذنين</a>
     <a href="about.html">من نحن</a>
     <a href="contact.html">تواصل معنا</a>
-    </nav>
     <button class="theme-btn" id="themeBtn">🌙</button>
-  </div>
+  </nav>
 
   <p class="kicker">الأذان</p>
   <h1>المؤذنون</h1>
   <p class="sub">استمع أو حمّل الأذان بصوت نخبة من المؤذنين</p>
+  <p class="sub"><a href="https://whatsapp.com/channel/0029Vb6Z3DKGZNCxQMUfPa0z" target="_blank" rel="noopener" style="color: var(--gold-soft); font-weight:700;">📢 تابعنا على قناة واتساب</a></p>
 
   <div id="status" class="status" style="display:none;"></div>
   <div class="list" id="list"></div>
 
-  <div style="margin: 30px 0 10px; display:flex; justify-content:center; overflow-x:auto;">
-    <script>
-      atOptions = {
-        'key' : '570d392d28207894e194c1615326d9b6',
-        'format' : 'iframe',
-        'height' : 90,
-        'width' : 728,
-        'params' : {}
-      };
-    </script>
-    <script src="https://www.highrevenueformat.com/570d392d28207894e194c1615326d9b6/invoke.js"></script>
-  </div>
 </div>
 
 <script>

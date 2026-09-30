@@ -24,8 +24,7 @@
   html,body{margin:0;padding:0;}
   body{background:radial-gradient(1200px 600px at 50% -10%,var(--bg-2),var(--bg) 60%);color:var(--cream);font-family:'Tajawal',sans-serif;min-height:100vh;}
   .wrap{max-width:680px;margin:0 auto;padding:36px 20px 80px;}
-  .topbar{display:flex;justify-content:space-between;align-items:center;margin-bottom:26px;}
-  .topnav{flex:1;display:flex;flex-wrap:wrap;justify-content:center;gap:8px;}
+  .topnav{display:flex;flex-wrap:wrap;justify-content:center;align-items:center;gap:8px;margin-bottom:26px;}
   .topnav a,.theme-btn{background:var(--panel);border:1px solid var(--line);color:var(--muted);text-decoration:none;font-size:14px;font-weight:700;padding:10px 16px;border-radius:999px;font-family:'Tajawal',sans-serif;cursor:pointer;transition:transform .12s ease;}
   .topnav a:active,.theme-btn:active{transform:scale(.94);}
   .kicker{font-family:'Reem Kufi',sans-serif;color:var(--gold-soft);text-align:center;margin:0 0 8px;}
@@ -47,7 +46,7 @@
   @media print{
     :root,:root[data-theme="light"],:root[data-theme="dark"]{--bg:#fff;--bg-2:#fff;--panel:#fff;--gold:#7a5b12;--gold-soft:#7a5b12;--cream:#000;--muted:#333;--line:#bbb;}
     body{background:#fff !important;color:#000 !important;}
-    .topbar,.back,.pdf-bar,.status{display:none !important;}
+    .topnav,.back,.pdf-bar,.status{display:none !important;}
     .wrap{max-width:none;padding:0;}
     .ayah{break-inside:avoid;box-shadow:none;}
     .num{background:#eee !important;color:#000 !important;border:1px solid #999;}
@@ -56,15 +55,13 @@
 </head>
 <body>
 <div class="wrap">
-  <div class="topbar">
-    <nav class="topnav">
+  <nav class="topnav">
       <a href="index.html">الرئيسية</a>
       <a href="about.html">من نحن</a>
       <a href="muezzins.html">المؤذنين</a>
       <a href="contact.html">تواصل معنا</a>
+      <button class="theme-btn" id="themeBtn">🌙</button>
     </nav>
-    <button class="theme-btn" id="themeBtn">🌙</button>
-  </div>
 
   <p class="kicker">التفسير الميسّر</p>
   <h1 id="title">سورة</h1>
@@ -97,7 +94,7 @@ document.getElementById('backLink').href='surah.html?number='+n;
   m.content='تفسير سورة '+name+' الميسّر آية بآية، مع نص الآيات — تلاوتي.';
   let c=document.querySelector('link[rel="canonical"]');
   if(!c){c=document.createElement('link');c.rel='canonical';document.head.appendChild(c);}
-  c.href=new URL('tafsir.html?number='+n, location.href).href;
+  try { c.href=new URL('tafsir.html?number='+n, location.href).href; } catch(e) { c.href='tafsir.html?number='+n; }
 })();
 
 const wantPdf=new URLSearchParams(location.search).get('pdf')==='1';
