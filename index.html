@@ -318,75 +318,19 @@ async function loadReciters(){
     reciters = data.reciters || [];
     reciterSelect.innerHTML = '<option value="">— اختر القارئ —</option>' +
       reciters.map((r,i) => `<option value="${i}">${r.name}</option>`).join('');
-    statusEl.textContent = "اكتب اسم سورة للبحث عنها بين كل القراء، أو اختر قارئًا لعرض تلاواته.";
+    statusEl.textContent = "اختر قارئًا لعرض السور المتاحة لديه.";
   }catch(e){
     statusEl.textContent = "تعذّر تحميل قائمة القراء. تحقق من اتصالك بالإنترنت وحاول مجددًا.";
   }
 }
 
-function buildRow(info){
-  const num = String(info.number).padStart(3,'0');
-  const row = document.createElement('div');
-  row.className = 'row';
-  row.dataset.info = JSON.stringify(info);
-  const reciterHtml = (info.rid !== undefined && info.rid !== null)
-    ? `<a href="reciter.html?id=${encodeURIComponent(info.rid)}">${esc(info.reciter)}</a>`
-    : esc(info.reciter);
-  row.innerHTML = `
-    <div class="row-top">
-      <div class="info">
-        <a class="surah-name" href="${esc(surahLink(info))}">سورة ${esc(info.name)}</a>
-        <span class="reciter-name">${reciterHtml} — ${esc(info.moshaf)}</span>
-      </div>
-      <div class="btn-group">
-        <button class="listen-btn" data-url="${esc(info.url)}">استماع</button>
-        <a class="dl-btn" href="download.html?url=${encodeURIComponent(info.url)}&name=${encodeURIComponent('سورة ' + info.name)}&reciter=${encodeURIComponent(info.reciter)}">تحميل</a>
-        <button class="share-btn" aria-label="مشاركة على واتساب"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><path d="M8.6 10.5l6.8-4M8.6 13.5l6.8 4"/></svg></button>
-      </div>
-    </div>
-    <div class="audio-wrap">
-      <audio controls controlsList="nodownload" oncontextmenu="return false" preload="none"></audio>
-    </div>
-  `;
-  return row;
-}
-
 function renderResults(){
   resultsEl.innerHTML = '';
   openRow = null;
-  const query = norm(surahInput.value).replace(/^سوره\s*/, '');
-
   if(!selectedReciter){
-    if(!query){
-      statusEl.textContent = "اكتب اسم سورة للبحث عنها بين كل القراء، أو اختر قارئًا لعرض تلاواته.";
-      return;
-    }
-    // No reciter chosen: search the surah across every reciter in the site.
-    const surahMatches = SURAHS
-      .map((name,idx) => ({num: idx+1, name}))
-      .filter(s => norm(s.name).includes(query));
-    if(surahMatches.length === 0){
-      statusEl.textContent = "لا توجد نتائج مطابقة.";
-      return;
-    }
-    let rowsBuilt = 0;
-    surahMatches.forEach(sm => {
-      const num = String(sm.num).padStart(3,'0');
-      (reciters || []).forEach(r => {
-        (r.moshaf || []).forEach(m => {
-          const nums = (m.surah_list || '').split(',').map(x => parseInt(x,10));
-          if(!nums.includes(sm.num)) return;
-          const url = m.server + num + ".mp3";
-          const info = {number: sm.num, name: sm.name, rid: r.id, reciter: r.name, moshaf: m.name, url};
-          resultsEl.appendChild(buildRow(info));
-          rowsBuilt++;
-        });
-      });
-    });
-    statusEl.textContent = rowsBuilt ? `${rowsBuilt} نتيجة بصوت قراء مختلفين` : "لا توجد نتائج مطابقة.";
+    statusEl.textContent = "اختر قارئًا لعرض السور المتاحة لديه.";
     return;
   }
-
   const list = selectedReciter.moshaf || [];
   // Pick the narration (moshaf) with the most surahs -- usually the full Quran recitation --
   // instead of whichever one the API happened to list first.
@@ -400,6 +344,7 @@ function renderResults(){
     return;
   }
   const availableNums = moshaf.surah_list.split(',').map(n => parseInt(n,10));
+  const query = norm(surahInput.value).replace(/^سوره\s*/, '');
 
   const matches = SURAHS
     .map((name,idx) => ({num: idx+1, name}))
@@ -416,7 +361,29 @@ function renderResults(){
     const num = String(s.num).padStart(3,'0');
     const url = moshaf.server + num + ".mp3";
     const info = {number: s.num, name: s.name, rid: selectedReciter.id, reciter: selectedReciter.name, moshaf: moshaf.name, url: url};
-    resultsEl.appendChild(buildRow(info));
+    const row = document.createElement('div');
+    row.className = 'row';
+    row.dataset.info = JSON.stringify(info);
+    const reciterHtml = (info.rid !== undefined && info.rid !== null)
+      ? `<a href="reciter.html?id=${encodeURIComponent(info.rid)}">${esc(info.reciter)}</a>`
+      : esc(info.reciter);
+    row.innerHTML = `
+      <div class="row-top">
+        <div class="info">
+          <a class="surah-name" href="${esc(surahLink(info))}">سورة ${esc(s.name)}</a>
+          <span class="reciter-name">${reciterHtml} — ${esc(info.moshaf)}</span>
+        </div>
+        <div class="btn-group">
+          <button class="listen-btn" data-url="${esc(url)}">استماع</button>
+          <a class="dl-btn" href="download.html?url=${encodeURIComponent(url)}&name=${encodeURIComponent('سورة ' + s.name)}&reciter=${encodeURIComponent(selectedReciter.name)}">تحميل</a>
+          <button class="share-btn" aria-label="مشاركة على واتساب"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><path d="M8.6 10.5l6.8-4M8.6 13.5l6.8 4"/></svg></button>
+        </div>
+      </div>
+      <div class="audio-wrap">
+        <audio controls controlsList="nodownload" oncontextmenu="return false" preload="none"></audio>
+      </div>
+    `;
+    resultsEl.appendChild(row);
   });
 }
 
