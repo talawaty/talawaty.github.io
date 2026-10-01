@@ -130,6 +130,17 @@
   }
 
   .results{margin-top: 22px; display:flex; flex-direction:column; gap:10px;}
+  .pager{
+    display:flex; align-items:center; justify-content:center; gap:14px;
+    margin-top: 8px; padding: 8px 0;
+  }
+  .pager-btn{
+    background: var(--panel); border: 1px solid var(--line); color: var(--gold-soft);
+    font-weight:700; font-size: 14px; padding: 10px 16px; border-radius: 999px;
+    font-family:'Tajawal', sans-serif; cursor:pointer;
+  }
+  .pager-btn:disabled{ opacity:0.4; }
+  .pager-info{ color: var(--muted); font-size: 13px; }
   .row{
     display:flex;
     flex-direction:column;
@@ -371,32 +382,27 @@ function renderResults(){
       .filter(s => norm(s.name).includes(query));
     if(surahMatches.length === 0){
       statusEl.textContent = "لا توجد نتائج مطابقة.";
+      searchAllMatches = [];
       return;
     }
-    const MAX_ROWS = 60;
-    const frag = document.createDocumentFragment();
-    let rowsBuilt = 0, truncated = false;
-    outer:
+    const all = [];
     for(const sm of surahMatches){
       const num = String(sm.num).padStart(3,'0');
       for(const r of (reciters || [])){
         for(const m of (r.moshaf || [])){
           const nums = (m.surah_list || '').split(',').map(x => parseInt(x,10));
           if(!nums.includes(sm.num)) continue;
-          if(rowsBuilt >= MAX_ROWS){ truncated = true; break outer; }
           const url = m.server + num + ".mp3";
-          const info = {number: sm.num, name: sm.name, rid: r.id, reciter: r.name, moshaf: m.name, url};
-          frag.appendChild(buildRow(info));
-          rowsBuilt++;
+          all.push({number: sm.num, name: sm.name, rid: r.id, reciter: r.name, moshaf: m.name, url});
         }
       }
     }
-    resultsEl.appendChild(frag);
-    statusEl.textContent = rowsBuilt
-      ? `${rowsBuilt} نتيجة بصوت قراء مختلفين${truncated ? ' (أول ' + MAX_ROWS + ' فقط، ضيّق البحث لعرض أدق)' : ''}`
-      : "لا توجد نتائج مطابقة.";
+    searchAllMatches = all;
+    searchPage = 1;
+    renderSearchPage();
     return;
   }
+  searchAllMatches = [];
 
   const list = selectedReciter.moshaf || [];
   // Pick the narration (moshaf) with the most surahs -- usually the full Quran recitation --
@@ -435,6 +441,39 @@ function renderResults(){
 
 // Inline expanding player: tapping "استماع" opens a native audio bar under that row
 let openRow = null;
+let searchAllMatches = [];
+let searchPage = 1;
+const PAGE_SIZE = 20;
+
+function renderSearchPage(){
+  resultsEl.innerHTML = '';
+  openRow = null;
+  const total = searchAllMatches.length;
+  const pages = Math.max(1, Math.ceil(total / PAGE_SIZE));
+  searchPage = Math.min(Math.max(1, searchPage), pages);
+
+  const start = (searchPage - 1) * PAGE_SIZE;
+  const pageItems = searchAllMatches.slice(start, start + PAGE_SIZE);
+
+  const frag = document.createDocumentFragment();
+  pageItems.forEach(info => frag.appendChild(buildRow(info)));
+  resultsEl.appendChild(frag);
+
+  statusEl.textContent = `${total} نتيجة بصوت قراء مختلفين`;
+
+  if(pages > 1){
+    const pager = document.createElement('div');
+    pager.className = 'pager';
+    pager.innerHTML = `
+      <button class="pager-btn" id="pagerPrev" ${searchPage<=1?'disabled':''}>→ السابق</button>
+      <span class="pager-info">صفحة ${searchPage} من ${pages}</span>
+      <button class="pager-btn" id="pagerNext" ${searchPage>=pages?'disabled':''}>التالي ←</button>
+    `;
+    resultsEl.appendChild(pager);
+    document.getElementById('pagerPrev').addEventListener('click', () => { searchPage--; renderSearchPage(); resultsEl.scrollIntoView({behavior:'smooth', block:'start'}); });
+    document.getElementById('pagerNext').addEventListener('click', () => { searchPage++; renderSearchPage(); resultsEl.scrollIntoView({behavior:'smooth', block:'start'}); });
+  }
+}
 
 resultsEl.addEventListener('click', (e) => {
   const sb = e.target.closest('.share-btn');
